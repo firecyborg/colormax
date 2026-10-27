@@ -52,3 +52,5 @@ Käivita frontend-kaustas:
 
 npm.cmd run lint
 npm.cmd run build
+
+Andmebaasi tabelite loomine- Ava pgAdminis colormax andmebaasi peal Query Tool, kopeeri sinna backend/schema.sql sisu ja käivita (F5).
