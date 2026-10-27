@@ -42,7 +42,7 @@ cd frontend
 npm.cmd ci
 npm.cmd run dev
 
-Ava terminalis kuvatud Local aadress, tavaliselt http://localhost:5173.
+Front-end avaneb brauseris aadressil http://127.0.0.1:5174. Port 5174 on fikseeritud, et vältida konflikti teiste projektidega. Kui port on kasutusel, peata selle projekti eelmine dev-server (Ctrl+C) ja käivita uuesti.
 
 Vite suunab /api algusega päringud Flaskile pordil 5000. Mõlemad serverid peavad töötama, et front-end saaks back-endilt andmeid küsida.
 
