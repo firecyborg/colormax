@@ -24,7 +24,7 @@ Esimesel seadistamisel loo näidisfaili põhjal oma .env:
 
 Copy-Item .env.example .env
 
-Muuda .env failis DATABASE_URL väärtust: sisesta oma PostgreSQL-i kasutajanimi, parool ja olemasoleva andmebaasi nimi.
+Muuda .env failis DATABASE_URL väärtust: küsi Neoni ühendusaadress tiimikaaslaselt või kopeeri see Neoni projektist (Connect, ilma connection poolinguta).
 
 Käivita Flask:
 
@@ -53,4 +53,4 @@ Käivita frontend-kaustas:
 npm.cmd run lint
 npm.cmd run build
 
-Andmebaasi tabelite loomine- Ava pgAdminis colormax andmebaasi peal Query Tool, kopeeri sinna backend/schema.sql sisu ja käivita (F5).
+Andmebaas asub Neonis ja tabelid on seal loodud. Ei pea ise looma. Kui schema.sql muutub, käivita muudatused Neoni SQL Editoris.
