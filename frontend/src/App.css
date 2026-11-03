@@ -83,3 +83,5 @@ button:focus-visible, input:focus-visible { outline: 3px solid #3e626b; outline-
   .register-card .brand-mark { margin-bottom: 32px; }
   .register-card .primary-button { min-height: 56px; }
 }
+
+.demo-hint { color: #548f91; font-size: 13px; line-height: 1.5; margin: 0 0 14px; }
