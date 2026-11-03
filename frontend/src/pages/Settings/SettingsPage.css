@@ -1,0 +1,38 @@
+.settings-page { width: min(100%, 402px); margin: 0 auto; padding: 48px 24px 76px; }
+.settings-header { display: flex; align-items: center; justify-content: space-between; position: relative; margin-bottom: 30px; }
+.settings-header .brand-mark { width: 48px; height: 48px; margin: 0; }
+.menu-toggle { display: grid; gap: 6px; padding: 8px; border: 0; background: transparent; }
+.menu-toggle span { width: 32px; height: 4px; background: #242126; }
+.account-menu { position: absolute; top: 52px; right: 0; z-index: 1; display: grid; padding: 8px; border: 1px solid #548f91; border-radius: 12px; background: white; box-shadow: 0 8px 24px #365f6820; }
+.account-menu button { border: 0; padding: 12px 20px; background: white; color: inherit; text-align: left; }
+.account-menu button:hover { background: #eef7f6; }
+.settings-page h1 { margin: 0 0 26px; font-size: 30px; line-height: 1.2; }
+.settings-card { margin-bottom: 23px; padding: 24px; border: 1px solid #548f91; border-radius: 24px; box-shadow: 0 16px 28px #365f6809; }
+.settings-card:last-child { margin-bottom: 0; }
+.settings-card h2 { font-size: 20px; margin: 0 0 22px; line-height: 1.3; }
+.settings-card h3 { font-size: 16px; margin: 0 0 5px; line-height: 1.3; }
+.settings-card p { font-size: 14px; color: #387f7c; line-height: 1.4; margin: 0 0 20px; }
+.account-identity { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; min-width: 0; }
+.account-identity > div { min-width: 0; }
+.account-avatar { display: grid; place-items: center; flex-shrink: 0; width: 55px; height: 55px; border-radius: 50%; background: #25c415; color: white; font-size: 24px; font-weight: 700; }
+.account-label, .account-details dt { font-size: 14px; color: #387f7c; }
+.account-identity .account-name { font-size: 28px; font-weight: 700; color: #3e626b; margin: 3px 0 0; overflow-wrap: anywhere; }
+.account-details { margin: 0; }
+.account-details > div + div { margin-top: 20px; }
+.account-details dd { margin: 6px 0 0; font-size: 17px; overflow-wrap: anywhere; }
+.settings-item { padding: 16px; border: 1px solid #548f91; border-radius: 16px; }
+.settings-item p { margin: 0; }
+.order-summary { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
+.order-status { padding: 6px 14px; border: 1px solid #25c415; border-radius: 22px; background: #ebf7e9; font-size: 14px; font-weight: 700; }
+.outline-button, .danger-button { width: 100%; min-height: 48px; padding: 10px 12px; border-radius: 12px; font-size: 16px; font-weight: 700; }
+.outline-button { border: 2px solid #3e626b; color: #3e626b; background: white; }
+.outline-button:hover { background: #eef7f6; }
+.settings-card .primary-button { margin-top: 20px; min-height: 47px; font-size: 16px; border-radius: 12px; }
+.danger-card { border: 2px solid #c51f19; }
+.danger-card h2 { color: #c51f19; }
+.danger-button { border: 0; background: #b9251c; color: white; }
+.danger-button:hover { background: #9e2018; }
+.delete-confirmation .outline-button { margin-top: 12px; }
+.settings-notice { padding: 16px; border-radius: 12px; background: #eef7f6; line-height: 1.5; }
+@media (min-width: 700px) { .settings-page { width: 620px; padding-top: 64px; } }
+@media (max-width: 360px) { .settings-page { padding-inline: 16px; } .settings-card { padding: 20px; } .order-summary { flex-wrap: wrap; } }
