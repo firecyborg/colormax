@@ -1,65 +1,143 @@
-Colormax
+# Colormax
 
-Projekt kasutab Reacti front-endis, Flaski back-endis ja PostgreSQL-i andmebaasina.
+Colormax on värviraamatute veebirakenduse prototüüp. Kasutajaliides on loodud Reacti ja Vitega, server Flaskiga ning PostgreSQL-i ühenduse jaoks on lisatud Psycopgi abimoodul.
 
-Vajalik tarkvara
+## Praegune seis
 
-Python 3.13
+- Kasutajaliideses on sisselogimise, registreerimise ja konto sätete vaated.
+- Sisselogimine ja registreerimine avavad kohaliku demoseansi ka tühjade või vigaste andmetega. Vormid ei kutsu praegu konto API-t.
+- Sisselogimisel kuvatakse Mari näidisandmeid. Registreerimisel kasutatakse sisestatud nime, e-posti ja sünnipäeva; tühjad väljad asendatakse näidisandmetega.
+- Konto andmed püsivad ainult Reacti mälus. Lehe värskendamine avab uuesti sisselogimise; paroole ei saadeta serverisse ega salvestata.
+- Tellimused ja värviraamatud on staatilised näited. „Telli uuesti” ja „Loo uus värviraamat” kuvavad teate, et toiming pole ühendatud.
+- „Logi välja” lõpetab demoseansi. „Kustuta konto” küsib kinnitust ja lõpetab samuti ainult demoseansi.
+- „Jäta mind meelde” ja „Unustasid parooli?” funktsionaalsus pole ühendatud.
+- Serveri sisselogimine ja registreerimine kasutavad PostgreSQL-i andmebaasi. Ülejäänud konto otspunktid kasutavad endiselt näidisandmeid või tagastavad ainult õnnestumise teate. Kasutajaliides pole nende otspunktidega ühendatud.
 
-Node.js koos npm-iga
+## Projekti struktuur
 
-PostgreSQL
+```text
+backend/
+  app.py                  Flaski rakendus ja konto API registreerimine
+  API/api_account.py      Konto API otspunktid
+  database.py             PostgreSQL-i ühenduse abifunktsioonid
+  services/database_account.py  Sisselogimine ja registreerimine andmebaasis
+  schema.sql              Andmebaasitabelite definitsioonid
+  .env.example            Andmebaasi seadistuse näidis
+  requirements.txt        Pythoni sõltuvused
+frontend/
+  src/App.jsx             Vaadete vahetamine ja demoseansi olek
+  src/pages/Login/        Sisselogimisvaade
+  src/pages/Register/     Registreerimisvaade
+  src/pages/Settings/     Konto sätted
+  src/pages/shared/       Jagatud komponendid
+  vite.config.js          Arendusserver ja API puhverserver
+Pildid/                   Autode, kosmose, loomade ja muinasjutu pildid
+Projekti kirjeldused/      Projektiplaan, disainijuhis ja muud kirjeldused
+```
 
-Allolevad käsud on Windowsi PowerShelli jaoks.
+## Vajalik tarkvara
 
-Back-endi seadistamine
+- Python 3.13 (projekti arenduses kasutatav versioon).
+- Node.js ja npm. Vite 8 jaoks kasuta Node.js versiooni 20.19+ või 22.12+.
+- Ligipääs projekti Neoni PostgreSQL-i andmebaasile serveri sisselogimise ja registreerimise kasutamiseks. Kasutajaliidese demovaate jaoks pole andmebaasi vaja.
 
-Alusta projekti juurkaustast:
+## Kasutajaliidese käivitamine
 
+Käivita projekti juurkaustast:
+
+```sh
+cd frontend
+npm ci
+npm run dev
+```
+
+Windowsi PowerShellis võib vajadusel kasutada `npm` asemel `npm.cmd`.
+
+Arendusserver avab aadressi <http://127.0.0.1:5174>. Port 5174 on fikseeritud (`strictPort: true`): kui see on hõivatud, vabasta port ja käivita server uuesti. Serveri peatamiseks vajuta `Ctrl+C`.
+
+Demovaate vaatamiseks piisab ainult kasutajaliidese käivitamisest. Vite suunab `/api` algusega päringud aadressile `http://127.0.0.1:5000`; nende päringute jaoks peab töötama ka Flask.
+
+## Serveri käivitamine
+
+Ava teine terminal projekti juurkaustas.
+
+### Windows PowerShell
+
+```powershell
 cd backend
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe app.py
+```
 
-Esimesel seadistamisel loo näidisfaili põhjal oma .env:
+### macOS / Linux
 
+```sh
+cd backend
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python app.py
+```
+
+Flask töötab aadressil <http://127.0.0.1:5000> silumisrežiimis. See käivitusviis on mõeldud kohalikuks arenduseks.
+
+PyCharmis vali interpretaatoriks Windowsis `backend/.venv/Scripts/python.exe` või macOS-is/Linuxis `backend/.venv/bin/python`.
+
+### Andmebaasi seadistamine
+
+Projekti andmebaas asub Neonis ja tabelid on seal juba loodud. Küsi ühendusaadress tiimikaaslaselt või kopeeri see Neoni projekti Connect-vaatest ilma connection poolinguta. Kopeeri `backend`-kaustas näidisfail:
+
+```powershell
+# Windows PowerShell
 Copy-Item .env.example .env
+```
 
-Muuda .env failis DATABASE_URL väärtust: küsi Neoni ühendusaadress tiimikaaslaselt või kopeeri see Neoni projektist (Connect, ilma connection poolinguta).
+```sh
+# macOS / Linux
+cp .env.example .env
+```
 
-Käivita Flask:
+Määra `.env` failis projekti Neoni ühendusaadress:
 
-.\.venv\Scripts\python.exe -m backend.app
+```dotenv
+DATABASE_URL="postgresql://KASUTAJA:PAROOL@HOST/neondb?sslmode=require&channel_binding=require"
+```
 
-Flask töötab aadressil http://127.0.0.1:5000.
+`database.py` loeb seadistuse `backend/.env` failist. `.env` on Gitist välja jäetud. Tabelite definitsioonid asuvad failis `backend/schema.sql`; skeemimuudatused rakenda Neoni SQL Editoris. Automaatset migratsioonisüsteemi projektis ei ole.
 
-PyCharmis vali back-endi interpretaatoriks backend/.venv/Scripts/python.exe.
+## Konto API
 
-Front-endi seadistamine
+Kõigi otspunktide eesliide on `/api/account`. POST- ja PATCH-päringute sisu saada JSON-ina päisega `Content-Type: application/json`.
 
-Ava teine terminal projekti juurkaustas:
+| Meetod | Teekond | Praegune käitumine |
+| --- | --- | --- |
+| GET | `/data?username=Mari` | Tagastab kasutajanime ning raamatu ja tellimuse näidisandmed. |
+| POST | `/login` | Otsib `username` välja järgi kasutajanime või e-posti andmebaasist ja kontrollib `password` väärtust; vale paari korral tagastab 401. |
+| POST | `/logout` | Tagastab õnnestumise teate. |
+| POST | `/register` | Salvestab kasutaja andmebaasi väljadega `username`, `password`, `email` ja `birthday`. Sünnipäev peab olema kujul `pp/kk/aaaa`; valideerimisvead tagastavad 400 ja olemasolev kasutajanimi või e-post 409. |
+| PATCH | `/change_password` | Nõuab mittetühje tekstivälju `previous_password` ja `new_password`. Praeguse parooli näidisväärtus on `1234`; uut parooli ei salvestata. |
+| DELETE | `/delete` | Tagastab kustutamise teate; andmeid ei kustutata. |
 
-cd frontend
-npm.cmd ci
-npm.cmd run dev
+Serveri sisselogimine eeldab andmebaasis olevat kasutajat. Kasutajaliidese demosse pääsemiseks serveri kontot vaja ei ole. Serveri praegune teostus salvestab parooli `password_hash` veergu muutmata kujul ja võrdleb seda otse; paroolide räsimine ja autentimisseansi loomine vajavad veel teostamist.
 
-Front-end avaneb brauseris aadressil http://127.0.0.1:5174. Port 5174 on fikseeritud, et vältida konflikti teiste projektidega. Kui port on kasutusel, peata selle projekti eelmine dev-server (Ctrl+C) ja käivita uuesti.
+## Kontrollimine
 
-Vite suunab /api algusega päringud Flaskile pordil 5000. Mõlemad serverid peavad töötama, et front-end saaks back-endilt andmeid küsida.
-Front-endi kontrollimine
+Käivita `frontend`-kaustas:
 
-Käivita frontend-kaustas:
+```sh
+npm run lint
+npm run build
+```
 
-npm.cmd run lint
-npm.cmd run build
+Tootmisjärgu failid tekivad kausta `frontend/dist`. Koostatud kasutajaliidese kohalikuks eelvaateks kasuta `npm run preview`. `/api` puhverserver on seadistatud arendusserverile; tootmiskeskkonna API suunamine vajab eraldi seadistust.
 
-Konto sätete demovaade
+Käsitsi kontrollimiseks:
 
-Sätete vaatamiseks piisab ainult front-endi käivitamisest. Vajuta „Logi sisse” või registreerimise vormil „Loo konto”: ka tühjad ja vigased andmed avavad demovaate. See on ajutine kasutajaliidese eelvaade, mitte autentimine.
+1. Ava konto sätted nii sisselogimise kui ka registreerimise vormilt.
+2. Sisesta registreerimisel oma nimi, e-post ja sünnipäev ning kontrolli nende kuvamist sätetes.
+3. Kontrolli päise menüüd, näidistoimingute teateid ja väljalogimist.
+4. Proovi konto kustutamise kinnitamist ja tühistamist.
+5. Värskenda lehte ja kontrolli, et demoseanss lõpeb.
+6. Kontrolli mobiilivaadet laiustel 320–498 px ja töölauavaadet.
 
-Sisselogimisel kasutatakse Mari näidisandmeid. Registreerimisel kuvatakse sisestatud nimi, e-post ja sünnipäev; tühjad väljad asendatakse näidisandmetega. Paroole ei salvestata ega saadeta. Andmed püsivad ainult Reacti mälus; lehe värskendamine avab uuesti sisselogimise.
-
-Tellimused ja värviraamatud on staatilised näited. „Telli uuesti” ja „Loo uus värviraamat” näitavad ühendamata toimingu teadet. „Logi välja” lõpetab demoseansi. „Kustuta konto” küsib kinnitust ja lõpetab ainult demoseansi; serveriandmeid ei muudeta.
-
-Kontrollimiseks ava mõlemast vormist sätted, proovi registreerimisel oma nime, ava päise menüü ning kontrolli väljalogimist ja kustutamise kinnitamist/tühistamist. Kontrolli mobiilivaadet laiustel 320–498 px ja töölauavaadet. Automaatkontrollid: `npm run lint` ja `npm run build` frontend-kaustas.
-
-Andmebaas asub Neonis ja tabelid on seal loodud. Ei pea ise looma. Kui schema.sql muutub, käivita muudatused Neoni SQL Editoris.
+Projektis ei ole praegu automaattestide käivitamise skripti.
