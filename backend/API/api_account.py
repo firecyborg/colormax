@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
+from services.database_account import register_database, login_database
 
 account_bp = Blueprint('account', __name__, url_prefix='/api/account')
 
@@ -14,14 +15,10 @@ def get_account_data():
 @account_bp.route('/login', methods=['POST'])
 def login():
     """Näiteandmetega"""
-    correct_password = "1234"
-    correct_username = "Jaagup"
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
-    if username == correct_username and password == correct_password:
-        return jsonify({"message": "Sisselogimine õnnestus", "user": {"username": username}}), 200
-    return jsonify({"error": "Vale kasutajanimi või parool"}), 401
+    return login_database(username, password)
 
 
 @account_bp.route('/logout', methods=['POST'])
@@ -37,19 +34,7 @@ def register():
     password = data.get("password")
     email = data.get("email")
     birthday = data.get("birthday")
-    if not username:
-        return jsonify({"error": "kasutajanimi on kohustuslik"}), 400
-    if not password:
-        return jsonify({"error": "parool on kohustuslik"}), 400
-    if not email:
-        return jsonify({"error": "email on kohustuslik"}), 400
-    try:
-        datetime.strptime(birthday, "%d/%m/%Y")
-    except (ValueError, TypeError):
-        return jsonify({
-            "error": "Sisesta korrektne sünnikuupäev kujul pp/kk/aaaa."
-        }), 400
-    return jsonify({"message": "Kasutaja loomine õnnestus", "user": {"username": username}}), 200
+    return register_database(username, password, email, birthday)
 
 
 @account_bp.route('/change_password', methods=['PATCH'])
