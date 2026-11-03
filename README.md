@@ -52,3 +52,13 @@ Käivita frontend-kaustas:
 
 npm.cmd run lint
 npm.cmd run build
+
+Konto sätete demovaade
+
+Sätete vaatamiseks piisab ainult front-endi käivitamisest. Vajuta „Logi sisse” või registreerimise vormil „Loo konto”: ka tühjad ja vigased andmed avavad demovaate. See on ajutine kasutajaliidese eelvaade, mitte autentimine.
+
+Sisselogimisel kasutatakse Mari näidisandmeid. Registreerimisel kuvatakse sisestatud nimi, e-post ja sünnipäev; tühjad väljad asendatakse näidisandmetega. Paroole ei salvestata ega saadeta. Andmed püsivad ainult Reacti mälus; lehe värskendamine avab uuesti sisselogimise.
+
+Tellimused ja värviraamatud on staatilised näited. „Telli uuesti” ja „Loo uus värviraamat” näitavad ühendamata toimingu teadet. „Logi välja” lõpetab demoseansi. „Kustuta konto” küsib kinnitust ja lõpetab ainult demoseansi; serveriandmeid ei muudeta.
+
+Kontrollimiseks ava mõlemast vormist sätted, proovi registreerimisel oma nime, ava päise menüü ning kontrolli väljalogimist ja kustutamise kinnitamist/tühistamist. Kontrolli mobiilivaadet laiustel 320–498 px ja töölauavaadet. Automaatkontrollid: `npm run lint` ja `npm run build` frontend-kaustas.
