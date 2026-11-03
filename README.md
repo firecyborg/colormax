@@ -11,7 +11,7 @@ Colormax on värviraamatute veebirakenduse prototüüp. Kasutajaliides on loodud
 - Tellimused ja värviraamatud on staatilised näited. „Telli uuesti” ja „Loo uus värviraamat” kuvavad teate, et toiming pole ühendatud.
 - „Logi välja” lõpetab demoseansi. „Kustuta konto” küsib kinnitust ja lõpetab samuti ainult demoseansi.
 - „Jäta mind meelde” ja „Unustasid parooli?” funktsionaalsus pole ühendatud.
-- Konto API kasutab näidisandmeid ega loe või salvesta andmeid PostgreSQL-is. Päris autentimine ja andmete püsiv salvestamine pole veel teostatud.
+- Serveri sisselogimine ja registreerimine kasutavad PostgreSQL-i andmebaasi. Ülejäänud konto otspunktid kasutavad endiselt näidisandmeid või tagastavad ainult õnnestumise teate. Kasutajaliides pole nende otspunktidega ühendatud.
 
 ## Projekti struktuur
 
@@ -20,6 +20,8 @@ backend/
   app.py                  Flaski rakendus ja konto API registreerimine
   API/api_account.py      Konto API otspunktid
   database.py             PostgreSQL-i ühenduse abifunktsioonid
+  services/database_account.py  Sisselogimine ja registreerimine andmebaasis
+  schema.sql              Andmebaasitabelite definitsioonid
   .env.example            Andmebaasi seadistuse näidis
   requirements.txt        Pythoni sõltuvused
 frontend/
@@ -37,7 +39,7 @@ Projekti kirjeldused/      Projektiplaan, disainijuhis ja muud kirjeldused
 
 - Python 3.13 (projekti arenduses kasutatav versioon).
 - Node.js ja npm. Vite 8 jaoks kasuta Node.js versiooni 20.19+ või 22.12+.
-- PostgreSQL, kui soovid kasutada `backend/database.py` ühenduse abifunktsioone. Praeguse demovaate ja konto API jaoks pole andmebaasi vaja.
+- Ligipääs projekti Neoni PostgreSQL-i andmebaasile serveri sisselogimise ja registreerimise kasutamiseks. Kasutajaliidese demovaate jaoks pole andmebaasi vaja.
 
 ## Kasutajaliidese käivitamine
 
@@ -83,7 +85,7 @@ PyCharmis vali interpretaatoriks Windowsis `backend/.venv/Scripts/python.exe` v�
 
 ### Andmebaasi seadistamine
 
-Kui hakkad kasutama andmebaasiühendust, loo esmalt PostgreSQL-is andmebaas. Seejärel kopeeri `backend`-kaustas näidisfail:
+Projekti andmebaas asub Neonis ja tabelid on seal juba loodud. Küsi ühendusaadress tiimikaaslaselt või kopeeri see Neoni projekti Connect-vaatest ilma connection poolinguta. Kopeeri `backend`-kaustas näidisfail:
 
 ```powershell
 # Windows PowerShell
@@ -95,13 +97,13 @@ Copy-Item .env.example .env
 cp .env.example .env
 ```
 
-Asenda `.env` failis kasutajanimi, parool ja andmebaasi nimi enda väärtustega:
+Määra `.env` failis projekti Neoni ühendusaadress:
 
 ```dotenv
-DATABASE_URL=postgresql://postgres:SINU_PAROOL@127.0.0.1:5432/SINU_ANDMEBAAS
+DATABASE_URL="postgresql://KASUTAJA:PAROOL@HOST/neondb?sslmode=require&channel_binding=require"
 ```
 
-`database.py` loeb seadistuse `backend/.env` failist. `.env` on Gitist välja jäetud. Projektis pole praegu andmebaasitabelite loomise ega migratsioonide skripte ning konto API ei kasuta seda ühendust.
+`database.py` loeb seadistuse `backend/.env` failist. `.env` on Gitist välja jäetud. Tabelite definitsioonid asuvad failis `backend/schema.sql`; skeemimuudatused rakenda Neoni SQL Editoris. Automaatset migratsioonisüsteemi projektis ei ole.
 
 ## Konto API
 
@@ -110,13 +112,13 @@ Kõigi otspunktide eesliide on `/api/account`. POST- ja PATCH-päringute sisu sa
 | Meetod | Teekond | Praegune käitumine |
 | --- | --- | --- |
 | GET | `/data?username=Mari` | Tagastab kasutajanime ning raamatu ja tellimuse näidisandmed. |
-| POST | `/login` | Kontrollib välju `username` ja `password`. Näidiskasutaja on `Jaagup`, parool `1234`; vale paari korral tagastab 401. |
+| POST | `/login` | Otsib `username` välja järgi kasutajanime või e-posti andmebaasist ja kontrollib `password` väärtust; vale paari korral tagastab 401. |
 | POST | `/logout` | Tagastab õnnestumise teate. |
-| POST | `/register` | Nõuab välju `username`, `password`, `email` ja `birthday`. Sünnipäev peab olema kujul `pp/kk/aaaa`; puudulike andmete korral tagastab 400. Kasutajat ei salvestata. |
+| POST | `/register` | Salvestab kasutaja andmebaasi väljadega `username`, `password`, `email` ja `birthday`. Sünnipäev peab olema kujul `pp/kk/aaaa`; valideerimisvead tagastavad 400 ja olemasolev kasutajanimi või e-post 409. |
 | PATCH | `/change_password` | Nõuab mittetühje tekstivälju `previous_password` ja `new_password`. Praeguse parooli näidisväärtus on `1234`; uut parooli ei salvestata. |
 | DELETE | `/delete` | Tagastab kustutamise teate; andmeid ei kustutata. |
 
-Need näidisandmed kehtivad serveri API kohta. Kasutajaliidese demosse pääsemiseks neid sisestama ei pea.
+Serveri sisselogimine eeldab andmebaasis olevat kasutajat. Kasutajaliidese demosse pääsemiseks serveri kontot vaja ei ole. Serveri praegune teostus salvestab parooli `password_hash` veergu muutmata kujul ja võrdleb seda otse; paroolide räsimine ja autentimisseansi loomine vajavad veel teostamist.
 
 ## Kontrollimine
 
