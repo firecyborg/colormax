@@ -28,7 +28,7 @@ Muuda .env failis DATABASE_URL väärtust: küsi Neoni ühendusaadress tiimikaas
 
 Käivita Flask:
 
-.\.venv\Scripts\python.exe app.py
+.\.venv\Scripts\python.exe -m backend.app
 
 Flask töötab aadressil http://127.0.0.1:5000.
 
@@ -45,7 +45,6 @@ npm.cmd run dev
 Front-end avaneb brauseris aadressil http://127.0.0.1:5174. Port 5174 on fikseeritud, et vältida konflikti teiste projektidega. Kui port on kasutusel, peata selle projekti eelmine dev-server (Ctrl+C) ja käivita uuesti.
 
 Vite suunab /api algusega päringud Flaskile pordil 5000. Mõlemad serverid peavad töötama, et front-end saaks back-endilt andmeid küsida.
-
 Front-endi kontrollimine
 
 Käivita frontend-kaustas:
