@@ -61,7 +61,7 @@ def register_database(username, password, email, birthday):
                     INSERT INTO users
                         (username, email, password_hash, birthday)
                     VALUES (%s, %s, %s, %s) 
-                    RETURNING id, username, email
+                    RETURNING id, username, email, birthday
                     """,
                     (username, email, password, birthday_date),
                 )
@@ -74,4 +74,4 @@ def register_database(username, password, email, birthday):
         print(error)
         return jsonify({"error": "Kasutaja loomine ebaõnnestus. Proovi hiljem uuesti."}), 500
 
-    return jsonify({"message": "Kasutaja loomine õnnestus", "user": {"id": user["id"], "username": user["username"]}}), 200
+    return jsonify({"message": "Kasutaja loomine õnnestus", "user": {"id": user["id"], "username": user["username"], "email": user["email"], "birthday": user["birthday"].strftime("%d/%m/%Y")}}), 200
