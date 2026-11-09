@@ -16,7 +16,7 @@ def login_database(username, password):
         with connection.cursor() as cursor:
             cursor.execute(
                 """
-                SELECT id, username, password_hash, email
+                SELECT id, username, password_hash, email, birthday
                 FROM users
                 WHERE username = %s OR email = %s
                 """,
@@ -27,7 +27,7 @@ def login_database(username, password):
         return jsonify({"error": "Vale kasutajanimi või parool"}), 401
     if not check_password_hash(user["password_hash"], password):
         return jsonify({"error": "Vale kasutajanimi või parool"}), 401
-    return jsonify({"message": "Sisselogimine õnnestus", "user": {"id": user["id"], "username": user["username"]}}), 200
+    return jsonify({"message": "Sisselogimine õnnestus", "user": {"id": user["id"], "username": user["username"], "email": user["email"], "birthday": user["birthday"].strftime("%d/%m/%Y")}}), 200
 
 def register_database(username, password, email, birthday):
     """Register account."""
