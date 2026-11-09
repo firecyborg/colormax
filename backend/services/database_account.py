@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import jsonify, current_app
 from psycopg import Error
 from psycopg.errors import UniqueViolation
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from database import get_connection
 from flask import session
 """Connect functions with database."""
@@ -25,20 +25,22 @@ def login_database(username, password):
             user = cursor.fetchone()
     if user is None:
         return jsonify({"error": "Vale kasutajanimi või parool"}), 401
-    if (username != user["username"] and username != user["email"]) or  password != user["password_hash"]:
-        return jsonify({"error": "Vale kasutajanimi, email või parool"}), 401
+    if not check_password_hash(user["password_hash"], password):
+        return jsonify({"error": "Vale kasutajanimi või parool"}), 401
     return jsonify({"message": "Sisselogimine õnnestus", "user": {"id": user["id"], "username": user["username"], "email": user["email"], "birthday": user["birthday"].strftime("%d/%m/%Y")}}), 200
 
 def register_database(username, password, email, birthday):
     """Register account."""
 
-    username = username.strip()
-    email = email.strip()
+    username = (username or "").strip()
+    email = (email or "").strip()
 
     if not username:
         return jsonify({"error": "kasutajanimi on kohustuslik"}), 400
     if not password:
         return jsonify({"error": "parool on kohustuslik"}), 400
+    if len(password) < 8:
+        return jsonify({"error": "parool peab olema vähemalt 8 märki"}), 400
     if not email:
         return jsonify({"error": "email on kohustuslik"}), 400
 
@@ -53,6 +55,8 @@ def register_database(username, password, email, birthday):
         return jsonify({"error": "Sisesta korrektne sünnikuupäev kujul pp/kk/aaaa."}), 400
     birthday_date = datetime.strptime(birthday, "%d/%m/%Y").date()
 
+    password_hash = generate_password_hash(password)
+
     try:
         with get_connection() as connection:
             with connection.cursor() as cursor:
@@ -63,7 +67,7 @@ def register_database(username, password, email, birthday):
                     VALUES (%s, %s, %s, %s) 
                     RETURNING id, username, email, birthday
                     """,
-                    (username, email, password, birthday_date),
+                    (username, email, password_hash, birthday_date),
                 )
                 user = cursor.fetchone()
 
