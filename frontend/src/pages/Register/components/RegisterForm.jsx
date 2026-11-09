@@ -73,13 +73,8 @@ export default function RegisterForm({ onContinue }) {
         setIsSubmitting(true)
 
         try {
-            const result = await registerAccount(values)
-
-            onContinue({
-                name: result.user.username.trim(),
-                email: result.user.email.trim(),
-                birthday: result.user.birthday.trim(),
-            })
+            await registerAccount(values)
+            await onContinue()
         }
         catch (error) {
             setErrors({

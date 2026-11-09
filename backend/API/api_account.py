@@ -1,15 +1,15 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from datetime import datetime
-from services.database_account import register_database, login_database
+from backend.services.database_account import register_database, login_database, get_account_data_database
 
 account_bp = Blueprint('account', __name__, url_prefix='/api/account')
 
 @account_bp.route('/data', methods=['GET'])
 def get_account_data():
     """Näiteandmetega"""
-    username = request.args.get("username")
-
-    return jsonify({"id": 1, "username": username, "books": "loomad", "tellimused": "loomad_tellimus"}), 200
+    if session.get('user_id') is None:
+        return jsonify({"error": "Pole kasutaja seanssi"}), 401
+    return get_account_data_database(session.get("user_id"))
 
 
 @account_bp.route('/login', methods=['POST'])
@@ -24,6 +24,7 @@ def login():
 @account_bp.route('/logout', methods=['POST'])
 def logout():
     """Näiteandmetega"""
+    session.clear()
     return jsonify({"message": "väljalogimine õnnestus"}), 200
 
 
