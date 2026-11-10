@@ -55,7 +55,7 @@ export default function LoginForm({ onContinue }) {
             setIsSubmitting(false)
         }
         }}>
-            <Field label="Email / Kasutajanimi" name="login-username" autoComplete="username" />
+            <Field label="Email / Kasutajanimi" name="login-username" placeholder="nimi@epost.ee või kasutajanimi" autoComplete="username" />
             <Field label="Parool" name="login-password" type="password" placeholder="••••••••" autoComplete="current-password" />
             {Object.keys(errors).length > 0 && (
             <ul role="alert">

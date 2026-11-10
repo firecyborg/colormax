@@ -85,11 +85,11 @@ export default function RegisterForm({ onContinue }) {
             setIsSubmitting(false)
         }
     }}>
-      <Field label="Email" name="register-email" type="email" autoComplete="email" />
-      <Field label="Kasutaja nimi" name="register-username" autoComplete="username" />
+      <Field label="Email" name="register-email" type="email" placeholder="nimi@epost.ee" autoComplete="email" />
+      <Field label="Kasutaja nimi" name="register-username" placeholder="Sinu kasutajanimi" autoComplete="username" />
       <Field label="Sünnipäev" name="birthday" placeholder="dd/mm/yyyy" autoComplete="bday" />
-      <Field label="Parool" name="register-password" type="password" autoComplete="new-password" />
-      <Field label="Korda parooli" name="confirm-password" type="password" autoComplete="new-password" />
+      <Field label="Parool" name="register-password" type="password" placeholder="••••••••" autoComplete="new-password" />
+      <Field label="Korda parooli" name="confirm-password" type="password" placeholder="••••••••" autoComplete="new-password" />
       {Object.keys(errors).length > 0 && (
           <ul role="alert">
               {Object.entries(errors).map(([field, message]) => (
