@@ -2,10 +2,11 @@ import { useState } from 'react'
 import LoginPage from './pages/Login/LoginPage.jsx'
 import RegisterPage from './pages/Register/RegisterPage.jsx'
 import SettingsPage from './pages/Settings/SettingsPage.jsx'
+import HomePage from './pages/Home/HomePage.jsx'
 import './App.css'
 
 export default function App() {
-  const [screen, setScreen] = useState('login')
+  const [screen, setScreen] = useState('home')
   const [account, setAccount] = useState(null)
   const openSettings = (details = {}) => {
     setAccount({ name: details.name || 'Mari', email: details.email || 'mari@epost.ee', birthday: details.birthday || '14.03.1994' })
@@ -17,6 +18,8 @@ export default function App() {
     setScreen('login')
     window.scrollTo(0, 0)
   }
+
+  if (screen === 'home') return <HomePage onAccount={() => setScreen(account ? 'settings' : 'login')} />
 
   if (screen === 'settings') return <SettingsPage account={account} onLogout={logout} />
 
