@@ -2,9 +2,9 @@ import { useRef } from 'react'
 import Logo from '../shared/components/Logo.jsx'
 import './HomePage.css'
 
-export default function HomePage({ onAccount }) {
+export default function HomePage({ onAccount, onCreate }) {
   const bookDialog = useRef(null)
-  const openBook = () => bookDialog.current.showModal()
+  const openBook = onCreate || (() => bookDialog.current.showModal())
 
   return <div className="homepage">
 
