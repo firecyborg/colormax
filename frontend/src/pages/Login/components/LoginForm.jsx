@@ -6,7 +6,7 @@ export default function LoginForm({ onContinue }) {
       event.preventDefault()
       onContinue()
     }}>
-      <Field label="Email / Kasutajanimi" name="login-username" autoComplete="username" />
+      <Field label="Email / Kasutajanimi" name="login-username" placeholder="nimi@epost.ee või kasutajanimi" autoComplete="username" />
       <Field label="Parool" name="login-password" type="password" placeholder="••••••••" autoComplete="current-password" />
       <div className="login-options">
         <label className="remember" htmlFor="remember">Jäta mind meelde <input id="remember" type="checkbox" /></label>
