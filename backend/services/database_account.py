@@ -3,7 +3,7 @@ from flask import jsonify, current_app
 from psycopg import Error
 from psycopg.errors import UniqueViolation
 from werkzeug.security import generate_password_hash, check_password_hash
-from backend.database import get_connection
+from database import get_connection
 from flask import session
 """Connect functions with database."""
 
