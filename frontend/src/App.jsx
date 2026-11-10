@@ -2,6 +2,7 @@ import { useState } from 'react'
 import LoginPage from './pages/Login/LoginPage.jsx'
 import RegisterPage from './pages/Register/RegisterPage.jsx'
 import SettingsPage from './pages/Settings/SettingsPage.jsx'
+import BookPage from './pages/Book/BookPage.jsx'
 import HomePage from './pages/Home/HomePage.jsx'
 import './App.css'
 
@@ -19,7 +20,9 @@ export default function App() {
     window.scrollTo(0, 0)
   }
 
-  if (screen === 'home') return <HomePage onAccount={() => setScreen(account ? 'settings' : 'login')} />
+  if (screen === 'book') return <BookPage onHome={() => setScreen('home')} onAccount={() => setScreen(account ? 'settings' : 'login')} />
+
+  if (screen === 'home') return <HomePage onCreate={() => setScreen('book')} onAccount={() => setScreen(account ? 'settings' : 'login')} />
 
   if (screen === 'settings') return <SettingsPage account={account} onLogout={logout} />
 
