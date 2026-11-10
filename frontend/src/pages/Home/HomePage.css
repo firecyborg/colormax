@@ -79,3 +79,32 @@
   .homepage .prices { gap: 12px; }
   .homepage .prices p { padding: 16px 12px; }
 }
+
+.homepage .eyebrow { margin: 0 0 18px; color: #387d7a; font: 700 11px 'DM Sans', sans-serif; letter-spacing: 2px; }
+.homepage .hero { position: relative; overflow: hidden; }
+.homepage .hero::after { content: ''; position: absolute; width: 200px; height: 200px; border: 1px solid #dcebe2; border-radius: 50%; right: -130px; top: -100px; pointer-events: none; box-shadow: 0 0 0 22px #eff6f0, 0 0 0 23px #e2eee5; }
+.homepage .account { padding: 0 0 30px; overflow: hidden; justify-content: flex-start; }
+.homepage .account-content { padding: 26px 30px 0; }
+.homepage .account h2 { font-size: 24px; margin-bottom: 8px; }
+.homepage .account p { font-size: 15px; margin-bottom: 22px; }
+.homepage .account > .outline { width: calc(100% - 60px); margin: auto 30px 0; }
+.homepage .book-scene { position: relative; min-height: 286px; display: grid; place-items: center; background: radial-gradient(ellipse at center, #e4efdb, #f2f7ef 70%); border-bottom: 1px solid #dce8dc; }
+.homepage .sample-book { width: 166px; padding: 19px 12px 14px; background: #fffef8; border: 1px solid #9ab7a8; border-left: 7px solid #387d7a; border-radius: 3px 12px 12px 3px; transform: rotate(-9deg); color: #395e66; box-shadow: 8px 12px 0 #395e6610, 12px 20px 25px #395e6618; }
+.homepage .sample-book svg { display: block; width: 100%; margin: 12px 0; }
+.homepage .book-caption { display: block; text-align: center; font-size: 9px; font-weight: 800; letter-spacing: 1px; }
+.homepage .book-footer { display: block; text-align: center; font-size: 8px; color: #387d7a; }
+.homepage .scene-pencil { width: 13px; height: 142px; position: absolute; right: 36px; top: 85px; background: linear-gradient(90deg, #32936f 50%, #26a96c 50%); border-radius: 3px 3px 0 0; transform: rotate(22deg); }
+.homepage .scene-pencil::after { content: ''; position: absolute; top: 100%; border-left: 6.5px solid transparent; border-right: 6.5px solid transparent; border-top: 22px solid #c9ac7c; }
+.homepage .scene-spark { position: absolute; color: #32936f; font-size: 26px; }
+.homepage .spark-one { top: 28px; right: 36px; }.homepage .spark-two { left: 28px; bottom: 60px; }
+.homepage .scene-label { position: absolute; bottom: 13px; font-size: 11px; color: #387d7a; }
+.homepage .how-it-works { grid-column: 1 / -1; padding-top: 24px; }
+.homepage .steps-heading { margin-bottom: 24px; }.homepage .steps-heading .eyebrow { margin-bottom: 10px; }
+.homepage .steps-heading h2 { margin: 0; font-size: 25px; font-weight: 800; letter-spacing: -.5px; }
+.homepage .creation-steps { display: grid; grid-template-columns: repeat(3, 1fr); padding: 0; margin: 0; list-style: none; gap: 24px; }
+.homepage .creation-steps li { display: flex; gap: 16px; padding: 24px 0; border-top: 1px solid #cfe0db; }
+.homepage .step-number { font: 500 24px 'DM Sans', sans-serif; color: #32936f; }
+.homepage .creation-steps h3 { font-size: 16px; margin: 0 0 8px; }.homepage .creation-steps p { color: #387d7a; font-size: 14px; line-height: 1.6; margin: 0; }
+@media (min-width: 801px) { .homepage main { margin-top: 24px; } }
+@media (max-width: 800px) { .homepage .account { display: grid; grid-template-columns: 1fr 1fr; padding: 0; }.homepage .book-scene { grid-row: span 2; border-bottom: 0; }.homepage .account > .outline { margin-bottom: 26px; }.homepage .creation-steps { gap: 16px; } }
+@media (max-width: 560px) { .homepage .account { display: flex; padding-bottom: 26px; }.homepage .book-scene { width: 100%; }.homepage .creation-steps { grid-template-columns: 1fr; gap: 0; }.homepage .how-it-works { padding-top: 12px; }.homepage .steps-heading h2 { font-size: 23px; }.homepage .account > .outline { margin-bottom: 0; } }
