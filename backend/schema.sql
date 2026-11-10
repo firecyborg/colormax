@@ -32,12 +32,13 @@ CREATE TABLE IF NOT EXISTS books (
     created_at TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 
--- Raamatu lehed ja nende järjekord (1–20, sama lehte võib kasutada mitu korda)
+-- Raamatu lehed ja nende järjekord (1–20, sama lehte ei saa ühes raamatus korrata)
 CREATE TABLE IF NOT EXISTS book_pages (
     book_id  INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE,
     page_id  INTEGER NOT NULL REFERENCES coloring_pages(id),
     position INTEGER NOT NULL CHECK (position BETWEEN 1 AND 20),
-    PRIMARY KEY (book_id, position)
+    PRIMARY KEY (book_id, position),
+    constraint book_pages_unique_page unique (book_id, page_id)
 );
 
 

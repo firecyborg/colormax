@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, session
 from datetime import datetime
-from backend.services.database_account import register_database, login_database, get_account_data_database
+from services.database_account import register_database, login_database, get_account_data_database
 
 account_bp = Blueprint('account', __name__, url_prefix='/api/account')
 
