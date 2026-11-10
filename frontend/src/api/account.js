@@ -42,3 +42,37 @@ export async function LoginToAccount(values) {
 
   return data
 }
+
+
+export async function getAccountData() {
+    const response = await fetch('/api/account/data', {})
+
+    if (response.status === 401) {
+        return null
+    }
+
+    const data = await response.json()
+
+    if(!response.ok) {
+        throw new Error(data.error || "Andmete saamine ebaõnnestus.")
+    }
+
+    return data
+}
+
+export async function logoutAccount(){
+    const response = await fetch("/api/account/logout", {
+        method: "POST",
+    })
+
+    const data = await response.json()
+
+    if(!response.ok) {
+        throw new Error(data.error || "Väljalogimine ebaõnnestus")
+    }
+
+    return data
+}
+
+
+

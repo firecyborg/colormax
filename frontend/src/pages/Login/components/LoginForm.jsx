@@ -41,13 +41,8 @@ export default function LoginForm({ onContinue }) {
 
         setIsSubmitting(true)
         try {
-            const result = await LoginToAccount(values)
-
-            onContinue({
-                name: result.user.username.trim(),
-                email: result.user.email.trim(),
-                birthday: result.user.birthday.trim(),
-            })
+            await LoginToAccount(values)
+            await onContinue()
         }
 
         catch (error) {

@@ -97,13 +97,16 @@ Copy-Item .env.example .env
 cp .env.example .env
 ```
 
-Määra `.env` failis projekti Neoni ühendusaadress:
+Määra `.env` failis projekti Neoni ühendusaadress ja SECRET KEY login seanssiks:
 
 ```dotenv
 DATABASE_URL="postgresql://KASUTAJA:PAROOL@HOST/neondb?sslmode=require&channel_binding=require"
+SECRET_KEY=(python -c "import secrets; print(secrets.token_hex(32))" kasutage seda et saada suvaline võti)
 ```
 
-`database.py` loeb seadistuse `backend/.env` failist. `.env` on Gitist välja jäetud. Tabelite definitsioonid asuvad failis `backend/schema.sql`; skeemimuudatused rakenda Neoni SQL Editoris. Automaatset migratsioonisüsteemi projektis ei ole.
+`database.py` loeb seadistuse `backend/.env` failist. `.env` on Gitist välja jäetud. Tabelite definitsioonid asuvad failis `backend/schema.sql`; skeemimuudatused rakenda Neoni SQL Editoris. Automaatset migratsioonisüsteemi projektis ei ole. 
+
+App.py loeb SECRET KEYd login seanssi loomiseks. Asendage SEXRET_KEY väärtus python -c "import secrets; print(secrets.token_hex(32))" terminalist saadud väärtusega.
 
 ## Konto API
 
