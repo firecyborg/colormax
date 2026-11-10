@@ -3,6 +3,7 @@ import { getAccountData, logoutAccount } from "./api/account.js";
 import LoginPage from './pages/Login/LoginPage.jsx'
 import RegisterPage from './pages/Register/RegisterPage.jsx'
 import SettingsPage from './pages/Settings/SettingsPage.jsx'
+import HomePage from './pages/Home/HomePage.jsx'
 import './App.css'
 
 
@@ -16,7 +17,7 @@ function toAccount(user) {
     }
 }
 export default function App() {
-    const [screen, setScreen] = useState('login')
+    const [screen, setScreen] = useState('home')
     const [account, setAccount] = useState(null)
     const [isCheckingSession, setIsCheckingSession] = useState(true)
     const [sessionError, setSessionError] = useState('')
@@ -33,7 +34,6 @@ export default function App() {
 
                 if (result !== null) {
                     setAccount(toAccount(result.user))
-                    setScreen('settings')
                 }
             }
             catch (error) {
@@ -91,6 +91,8 @@ export default function App() {
             </p>
         )
     }
+    if (screen === 'home') return <HomePage onAccount={() => setScreen(account ? 'settings' : 'login')} />
+
     if (screen === 'settings') return <SettingsPage account={account} onLogout={logout} />
 
     const registration = screen === 'register'
