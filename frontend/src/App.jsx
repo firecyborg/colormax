@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getAccountData, logoutAccount } from "./api/account.js";
+import { getAccountData, logoutAccount, deleteAccount } from "./api/account.js";
 import LoginPage from './pages/Login/LoginPage.jsx'
 import RegisterPage from './pages/Register/RegisterPage.jsx'
 import SettingsPage from './pages/Settings/SettingsPage.jsx'
@@ -32,7 +32,6 @@ export default function App() {
                 if (!active) {
                     return
                 }
-
                 if (result !== null) {
                     setAccount(toAccount(result.user))
                 }
@@ -79,7 +78,16 @@ export default function App() {
         catch(error) {
             window.alert(error.message)
         }
-
+    }
+    const processDelete = async () => {
+        try {
+            await deleteAccount()
+            setAccount(null)
+            setScreen('login')
+        }
+        catch (error) {
+        window.alert(error.message)
+        }
     }
     if (isCheckingSession) {
     return <p role="status">Kontrollin sisselogimist…</p>
@@ -96,7 +104,7 @@ export default function App() {
 
     if (screen === 'home') return <HomePage onCreate={() => setScreen('book')} onAccount={() => setScreen(account ? 'settings' : 'login')} />
 
-    if (screen === 'settings') return <SettingsPage account={account} onLogout={logout} />
+    if (screen === 'settings') return <SettingsPage account={account} onLogout={logout} onDelete={processDelete} />
 
     const registration = screen === 'register'
 

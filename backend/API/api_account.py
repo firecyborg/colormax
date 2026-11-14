@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, session
 from datetime import datetime
-from services.database_account import register_database, login_database, get_account_data_database
+from services.database_account import register_database, login_database, get_account_data_database, delete_account_database
+
 
 account_bp = Blueprint('account', __name__, url_prefix='/api/account')
 
@@ -55,7 +56,13 @@ def change_password():
 
 @account_bp.route('/delete', methods=['DELETE'])
 def delete_account():
-    return jsonify({"message": "Kasutaja kustutatud"}), 200
+    user_id = session.get("user_id")
+    if user_id is None:
+        return jsonify({"error": "Pole kasutaja seanssi"}), 401
+    response, status = delete_account_database(user_id)
+    if status == 200:
+        session.clear()
+    return response, status
 
 
 
