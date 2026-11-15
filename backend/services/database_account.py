@@ -33,6 +33,7 @@ def login_database(username, password):
 
     return jsonify({"message": "Sisselogimine õnnestus", "user": {"id": user["id"], "username": user["username"], "email": user["email"], "birthday": user["birthday"].strftime("%d/%m/%Y")}}), 200
 
+
 def register_database(username, password, email, birthday):
     """Register account."""
 
