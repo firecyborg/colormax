@@ -2,7 +2,7 @@ import { useState } from 'react'
 import Logo from '../shared/components/Logo.jsx'
 import './SettingsPage.css'
 
-export default function SettingsPage({ account, onLogout }) {
+export default function SettingsPage({ account, onLogout, onDelete }) {
     const [menuOpen, setMenuOpen] = useState(false)
     const [notice, setNotice] = useState('')
     const [confirmDelete, setConfirmDelete] = useState(false)
@@ -58,8 +58,8 @@ export default function SettingsPage({ account, onLogout }) {
                 <h2 id="delete-heading">Kustuta konto</h2>
                 <p>Konto ja kõik sinu salvestatud värviraamatud kustutatakse jäädavalt. Seda ei saa tagasi võtta.</p>
                 {confirmDelete ? <div className="delete-confirmation">
-                    <p>See on demovaade. Kinnitamine lõpetab ainult kohaliku demoseansi.</p>
-                    <button type="button" className="danger-button" onClick={onLogout}>Kinnita demoseansi lõpetamine</button>
+                    <p>Kas soovid konto koos loodud raamatutega igavesti kustutada?</p>
+                    <button type="button" className="danger-button" onClick={onDelete}>Kustuta konto</button>
                     <button type="button" className="outline-button" onClick={() => setConfirmDelete(false)}>Loobu</button>
                 </div> : <button type="button" className="danger-button" onClick={() => setConfirmDelete(true)}>Kustuta konto</button>}
             </section>

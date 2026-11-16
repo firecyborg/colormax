@@ -86,8 +86,6 @@ def register_database(username, password, email, birthday):
     return jsonify({"message": "Kasutaja loomine õnnestus", "user": {"id": user["id"], "username": user["username"], "email": user["email"], "birthday": user["birthday"].strftime("%d/%m/%Y")}}), 200
 
 
-
-
 def get_account_data_database(user_id):
     """Get account data."""
     with get_connection() as connection:
@@ -118,4 +116,39 @@ def get_account_data_database(user_id):
             orders = cursor.fetchall()
 
     return jsonify({"message": "Andmed edukalt saadud", "user": {"id": user["id"], "username": user["username"], "email": user["email"], "birthday": user["birthday"].strftime("%d/%m/%Y"), "created_at": user["created_at"].isoformat(), "books": books, "orders": orders}}), 200
+
+
+def delete_account_database(user_id):
+    """Delete account."""
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                DELETE FROM orders
+                WHERE user_id = %s
+                RETURNING id
+                """,
+                (user_id,),
+            )
+            orders_deleted = cursor.fetchall()
+            cursor.execute(
+                """
+                DELETE FROM books
+                WHERE user_id = %s
+                RETURNING id
+                """,
+                (user_id, ),
+            )
+            books_deleted = cursor.fetchall()
+            cursor.execute(
+                """
+                DELETE FROM users
+                WHERE id = %s
+                RETURNING id
+                """,
+                (user_id,),
+            )
+            user_deleted = cursor.fetchall()
+    return jsonify({"message": "Andmed ja konto edukalt kustutatud", "user": user_deleted, "books": books_deleted, "orders": orders_deleted}), 200
+
 
