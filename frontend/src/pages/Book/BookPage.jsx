@@ -15,6 +15,8 @@ export default function BookPage({ onHome, onAccount }) {
   const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
   const [checkout, setCheckout] = useState(false)
+  const [previewStep, setPreviewStep] = useState(false)
+  const [previewPage, setPreviewPage] = useState(0)
   const [delivery, setDelivery] = useState('standard')
   const [payment, setPayment] = useState('card')
   const [customer, setCustomer] = useState({ name: '', email: '', address: '' })
@@ -63,6 +65,16 @@ export default function BookPage({ onHome, onAccount }) {
   const grandTotal = total + deliveryPrice
   const updateCustomer = (event) => setCustomer({ ...customer, [event.target.name]: event.target.value })
 
+  if (previewStep) return <div className="book-page preview-step-page">
+    <header className="book-header"><button className="book-logo" onClick={() => setPreviewStep(false)} aria-label="Tagasi lehekülgi valima"><Logo /></button><nav aria-label="Tellimuse sammud"><button onClick={() => setPreviewStep(false)}>Tagasi kujunduse juurde</button><strong>1. Leheküljed</strong><span aria-current="step">2. Eelvaade</span><span>3. Maksmine</span></nav></header>
+    <main className="preview-step-main"><div className="checkout-heading"><h1>Vaata oma värviraamatut</h1><p>Kontrolli pilte ja järjekorda enne tellimuse vormistamist.</p></div>
+      {!selected.length ? <section className="preview-empty book-card"><span aria-hidden="true">＋</span><h2>Sinu raamat ootab pilte</h2><p>Vali pildikogust mõned leheküljed, siis saad oma raamatut eelvaates sirvida.</p><button className="book-primary" onClick={() => setPreviewStep(false)}>Lisa pilte</button></section> : <div className="preview-step-layout">
+        <section className="book-preview-stage" aria-label="Raamatu eelvaade"><div className="preview-book"><div className="preview-book-spread"><article className="preview-book-page preview-left-page"><span className="preview-page-number">{previewPage + 1}</span><img src={imageUrl(selected[previewPage])} alt={selected[previewPage].title} /><strong>{selected[previewPage].title}</strong></article><article className="preview-book-page preview-right-page">{selected[previewPage + 1] ? <><span className="preview-page-number">{previewPage + 2}</span><img src={imageUrl(selected[previewPage + 1])} alt={selected[previewPage + 1].title} /><strong>{selected[previewPage + 1].title}</strong></> : <div className="preview-last-page"><Logo /><strong>{title.trim() || 'Minu värviraamat'}</strong><span>Siin algavad sinu lood</span></div>}</article></div></div><div className="preview-controls"><button type="button" className="book-outline" disabled={previewPage === 0} onClick={() => setPreviewPage(Math.max(0, previewPage - 2))}>← Eelmised lehed</button><span aria-live="polite">{previewPage + 1}–{Math.min(previewPage + 2, selected.length)} / {selected.length}</span><button type="button" className="book-outline" disabled={previewPage + 2 >= selected.length} onClick={() => setPreviewPage(Math.min(selected.length - 1, previewPage + 2))}>Järgmised lehed →</button></div><div className="preview-thumbnails" aria-label="Valitud leheküljed">{selected.map((page,index)=><button type="button" key={page.id} aria-label={`Ava lehekülg ${index + 1}: ${page.title}`} aria-current={index === previewPage || index === previewPage + 1 ? 'page' : undefined} onClick={() => setPreviewPage(index % 2 === 0 ? index : index - 1)}><img src={imageUrl(page)} alt="" /><span>{index + 1}</span></button>)}</div></section>
+        <aside className="preview-order-card"><h2>Sinu raamat</h2><div className="preview-cover"><Logo /><strong>{title.trim() || 'Minu värviraamat'}</strong><span>{selected.length} värvimislehekülge</span></div><dl><div><dt>Lehekülgi</dt><dd>{selected.length}</dd></div><div><dt>Raamatu hind</dt><dd>{money(total)}</dd></div></dl><button type="button" className="book-outline" onClick={() => setPreviewStep(false)}>Muuda pilte</button><button type="button" className="book-primary" onClick={() => setCheckout(true)}>Jätka tellimusega <span aria-hidden="true">→</span></button></aside>
+      </div>}
+    </main>
+  </div>
+
   if (checkout) return <div className="book-page checkout-page">
     <header className="book-header"><button className="book-logo" onClick={() => setCheckout(false)} aria-label="Tagasi raamatu juurde"><Logo /></button><nav aria-label="Tellimuse sammud"><button onClick={() => setCheckout(false)}>Tagasi kujunduse juurde</button><span>1. Leheküljed</span><span>2. Eelvaade</span><strong>3. Maksmine</strong></nav></header>
     <main className="checkout-main"><div className="checkout-heading"><h1>Peaaegu valmis!</h1><p>Vali, kuidas sinu värviraamat sinuni jõuab.</p></div><div className="checkout-layout">
@@ -77,7 +89,7 @@ export default function BookPage({ onHome, onAccount }) {
   return <div className="book-page">
     <header className="book-header"><button className="book-logo" onClick={onHome} aria-label="Avaleht"><Logo /></button><nav aria-label="Peamenüü"><button onClick={onHome}>Avaleht</button><button aria-current="page">Uus raamat</button><button onClick={onAccount}>Konto sätted</button></nav></header>
     <main className="book-main">
-      <div className="book-heading"><p className="book-eyebrow">SINU IDEED. SINU VÄRVID.</p><h1>Koosta oma värviraamat</h1><p>Vali pildid, sea need järjekorda ja vaata eelvaadet. Hind arvutatakse lehekülgede arvu järgi.</p><ol className="book-steps"><li>1 · Vali pildid</li><li>2 · Sea järjekord</li><li>3 · Telli</li></ol></div>
+      <div className="book-heading"><p className="book-eyebrow">SINU IDEED. SINU VÄRVID.</p><h1>Koosta oma värviraamat</h1><p>Vali pildid, sea need järjekorda ja vaata eelvaadet. Hind arvutatakse lehekülgede arvu järgi.</p><ol className="book-steps"><li>1 · Leheküljed</li><li>2 · Eelvaade</li><li>3 · Maksmine</li></ol></div>
       <div className="book-layout">
         <section className="book-library book-card" aria-labelledby="library-title"><h2 id="library-title">Pildikogu</h2>
           <div className="book-filters" aria-label="Kategooriad"><button aria-pressed={category === 'all'} onClick={() => setCategory('all')}>Kõik</button>{categories.map((item) => <button key={item.id ?? item.ID} aria-pressed={category === String(item.id ?? item.ID)} onClick={() => setCategory(String(item.id ?? item.ID))}>{item.name}</button>)}</div>
@@ -90,9 +102,9 @@ export default function BookPage({ onHome, onAccount }) {
           <section className="book-card"><div className="book-summary-heading"><h2>Sinu raamat</h2><span aria-live="polite">{selected.length} lk</span></div><label className="book-title-label" htmlFor="book-cover-title">Kaane pealkiri</label><input id="book-cover-title" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Näiteks: Loomad kosmoses" maxLength={100} />
             {!selected.length && <div className="book-empty"><span aria-hidden="true">＋</span><h3>Sinu lugu algab siit</h3><p>Lisa pildikogust oma lemmikud. Need ilmuvad siia sinu valitud järjekorras.</p></div>}
             <ol className="selected-pages">{selected.map((page, index) => <li key={page.id}><span>{index + 1}</span><img src={imageUrl(page)} alt="" /><strong>{page.title}</strong><button disabled={index === 0} onClick={() => move(index, -1)} aria-label={`Liiguta ${page.title} üles`}>↑</button><button disabled={index === selected.length - 1} onClick={() => move(index, 1)} aria-label={`Liiguta ${page.title} alla`}>↓</button><button className="remove-page" onClick={() => toggle(page)} aria-label={`Eemalda ${page.title}`}>×</button></li>)}</ol>
-            <button className="book-outline" disabled={!selected.length} onClick={() => preview.current.showModal()}>Vaata eelvaadet</button>
+            <button className="book-outline" disabled={!selected.length} onClick={() => { setPreviewPage(0); setPreviewStep(true) }}>Vaata eelvaadet</button>
           </section>
-          <section className="book-pricing" aria-labelledby="price-title"><h2 id="price-title">Hinnakokkuvõte</h2><dl><div><dt>Lehekülgi</dt><dd>{selected.length}</dd></div><div><dt>Alushind</dt><dd>{money(800)}</dd></div><div><dt>{selected.length} lk × {money(45)}</dt><dd>{money(selected.length * 45)}</dd></div><div className="book-total"><dt>Hind kokku</dt><dd>{money(total)}</dd></div></dl><button className="book-primary" disabled={!selected.length} onClick={() => setCheckout(true)}>Telli raamat <span aria-hidden="true">→</span></button><p className="book-price-note">Hind sisaldab raamatu koostamist</p></section>
+          <section className="book-pricing" aria-labelledby="price-title"><h2 id="price-title">Hinnakokkuvõte</h2><dl><div><dt>Lehekülgi</dt><dd>{selected.length}</dd></div><div><dt>Alushind</dt><dd>{money(800)}</dd></div><div><dt>{selected.length} lk × {money(45)}</dt><dd>{money(selected.length * 45)}</dd></div><div className="book-total"><dt>Hind kokku</dt><dd>{money(total)}</dd></div></dl><button className="book-primary" disabled={!selected.length} onClick={() => { setPreviewPage(0); setPreviewStep(true) }}>Vaata eelvaadet <span aria-hidden="true">→</span></button><p className="book-price-note">Hind sisaldab raamatu koostamist</p></section>
         </aside>
       </div>
     </main>
