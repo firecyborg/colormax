@@ -1,6 +1,8 @@
 .settings-page { width: min(100%, 402px); margin: 0 auto; padding: 48px 24px 76px; }
 .settings-header { display: flex; align-items: center; justify-content: space-between; position: relative; margin-bottom: 30px; }
 .settings-header .brand-mark { width: 48px; height: 48px; margin: 0; }
+.settings-home { border: 0; padding: 0; background: transparent; border-radius: 8px; }
+.settings-home:focus-visible { outline: 3px solid #25c415; outline-offset: 4px; }
 .menu-toggle { display: grid; gap: 6px; padding: 8px; border: 0; background: transparent; }
 .menu-toggle span { width: 32px; height: 4px; background: #242126; }
 .account-menu { position: absolute; top: 52px; right: 0; z-index: 1; display: grid; padding: 8px; border: 1px solid #548f91; border-radius: 12px; background: white; box-shadow: 0 8px 24px #365f6820; }
