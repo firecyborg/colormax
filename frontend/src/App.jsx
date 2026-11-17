@@ -104,7 +104,7 @@ export default function App() {
 
     if (screen === 'home') return <HomePage onCreate={() => setScreen('book')} onAccount={() => setScreen(account ? 'settings' : 'login')} />
 
-    if (screen === 'settings') return <SettingsPage account={account} onLogout={logout} onDelete={processDelete} />
+    if (screen === 'settings') return <SettingsPage account={account} onLogout={logout} onDelete={processDelete} onHome={() => { setScreen('home'); window.scrollTo(0, 0) }} />
 
     const registration = screen === 'register'
 

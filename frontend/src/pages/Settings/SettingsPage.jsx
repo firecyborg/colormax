@@ -2,7 +2,7 @@ import { useState } from 'react'
 import Logo from '../shared/components/Logo.jsx'
 import './SettingsPage.css'
 
-export default function SettingsPage({ account, onLogout, onDelete }) {
+export default function SettingsPage({ account, onLogout, onDelete, onHome }) {
     const [menuOpen, setMenuOpen] = useState(false)
     const [notice, setNotice] = useState('')
     const [confirmDelete, setConfirmDelete] = useState(false)
@@ -11,7 +11,7 @@ export default function SettingsPage({ account, onLogout, onDelete }) {
     return (
         <main className="settings-page">
             <header className="settings-header">
-                <Logo />
+                <button className="settings-home" type="button" onClick={onHome} aria-label="Avaleht"><Logo /></button>
                 <button className="menu-toggle" type="button" aria-label="Ava menüü" aria-expanded={menuOpen} aria-controls="account-menu" onClick={() => setMenuOpen(!menuOpen)}>
                     <span /><span /><span />
                 </button>
