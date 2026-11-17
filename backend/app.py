@@ -1,11 +1,20 @@
 from flask import Flask
-
+import os
+from pathlib import Path
+from dotenv import load_dotenv
 from API.api_account import account_bp
+from API.api_pages import pages_bp
+from API.api_book import book_bp
+
 
 
 def create_app():
+    load_dotenv(Path(__file__).with_name(".env"))
     app = Flask(__name__)
+    app.register_blueprint(pages_bp)
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
     app.register_blueprint(account_bp)
+    app.register_blueprint(book_bp)
     return app
 
 if __name__ == "__main__":
