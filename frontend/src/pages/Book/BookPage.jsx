@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import Logo from '../shared/components/Logo.jsx'
+import CheckoutPage from '../Checkout/CheckoutPage.jsx'
+import { BASE_PRICE, PAGE_PRICE } from '../shared/prices.js'
 import './BookPage.css'
+
 
 const money = (cents) => new Intl.NumberFormat('et-EE', { style: 'currency', currency: 'EUR' }).format(cents / 100)
 const imageUrl = (page) => `/api/images/${page.file_path.split('/').map(encodeURIComponent).join('/')}`
@@ -15,7 +18,7 @@ export default function BookPage({ onHome, onAccount }) {
   const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
   const preview = useRef(null)
-  const order = useRef(null)
+  const [checkout, setCheckout] = useState(false)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -54,7 +57,19 @@ export default function BookPage({ onHome, onAccount }) {
     })
   }
   const visible = pages.filter((page) => category === 'all' || String(page.category_id) === category)
-  const total = 800 + selected.length * 45
+  const total = BASE_PRICE + selected.length * PAGE_PRICE
+
+  if (checkout) {
+    return (
+      <CheckoutPage
+        title={title}
+        pages={selected}
+        onHome={onHome}
+        onPages={() => setCheckout(false)}
+        onSubmit={(order) => console.log('Tellimus:', order)}
+      />
+    )
+  }
 
   return <div className="book-page">
     <header className="book-header"><button className="book-logo" onClick={onHome} aria-label="Avaleht"><Logo /></button><nav aria-label="Peamenüü"><button onClick={onHome}>Avaleht</button><button aria-current="page">Uus raamat</button><button onClick={onAccount}>Konto sätted</button></nav></header>
@@ -74,11 +89,10 @@ export default function BookPage({ onHome, onAccount }) {
             <ol className="selected-pages">{selected.map((page, index) => <li key={page.id}><span>{index + 1}</span><img src={imageUrl(page)} alt="" /><strong>{page.title}</strong><button disabled={index === 0} onClick={() => move(index, -1)} aria-label={`Liiguta ${page.title} üles`}>↑</button><button disabled={index === selected.length - 1} onClick={() => move(index, 1)} aria-label={`Liiguta ${page.title} alla`}>↓</button><button className="remove-page" onClick={() => toggle(page)} aria-label={`Eemalda ${page.title}`}>×</button></li>)}</ol>
             <button className="book-outline" disabled={!selected.length} onClick={() => preview.current.showModal()}>Vaata eelvaadet</button>
           </section>
-          <section className="book-pricing" aria-labelledby="price-title"><h2 id="price-title">Hinnakokkuvõte</h2><dl><div><dt>Lehekülgi</dt><dd>{selected.length}</dd></div><div><dt>Alushind</dt><dd>{money(800)}</dd></div><div><dt>{selected.length} lk × {money(45)}</dt><dd>{money(selected.length * 45)}</dd></div><div className="book-total"><dt>Hind kokku</dt><dd>{money(total)}</dd></div></dl><button className="book-primary" disabled={!selected.length} onClick={() => order.current.showModal()}>Telli raamat <span aria-hidden="true">→</span></button><p className="book-price-note">Näidishinnad · tellimuse vormistamine lisandub peagi</p></section>
+          <section className="book-pricing" aria-labelledby="price-title"><h2 id="price-title">Hinnakokkuvõte</h2><dl><div><dt>Lehekülgi</dt><dd>{selected.length}</dd></div><div><dt>Alushind</dt><dd>{money(BASE_PRICE)}</dd></div><div><dt>{selected.length} lk × {money(PAGE_PRICE)}</dt><dd>{money(selected.length * PAGE_PRICE)}</dd></div><div className="book-total"><dt>Hind kokku</dt><dd>{money(total)}</dd></div></dl><button className="book-primary" disabled={!selected.length} onClick={() => setCheckout(true)}>Telli raamat <span aria-hidden="true">→</span></button><p className="book-price-note">Näidishinnad · tellimuse vormistamine lisandub peagi</p></section>
         </aside>
       </div>
     </main>
     <dialog className="book-dialog" ref={preview}><form method="dialog"><button className="dialog-close" aria-label="Sulge eelvaade">×</button></form><h2>{title.trim() || 'Minu värviraamat'}</h2><p>{selected.length} lehekülge · {money(total)}</p><div className="preview-pages">{selected.map((page, index) => <figure key={page.id}><img src={imageUrl(page)} alt={page.title} /><figcaption>{index + 1}. {page.title}</figcaption></figure>)}</div></dialog>
-    <dialog className="book-dialog" ref={order}><h2>Sinu raamat on kokku pandud!</h2><p>Valisid {selected.length} lehekülge. Tellimuse vormistamine ja maksmine pole veel saadaval. Sinu valik säilib selles vaates.</p><form method="dialog"><button className="book-outline">Tagasi koostama</button></form></dialog>
   </div>
 }

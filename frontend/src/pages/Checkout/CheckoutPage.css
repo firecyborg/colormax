@@ -1,0 +1,138 @@
+.pay-page {
+  --pay-dark: #395e66;
+  --pay-green: #2bc21b;
+  --pay-tint: #e8f6e4;
+  --pay-line: #8fbfb0;
+  min-height: 100vh;
+  background: #fff;
+  color: var(--pay-dark);
+}
+
+/* Päis */
+.pay-header {
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 28px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.pay-logo { border: 0; background: none; padding: 0; cursor: pointer; }
+.pay-header nav { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; font-size: 0.8rem; }
+.pay-header nav button,
+.pay-header nav span { border: 0; background: none; color: inherit; font: inherit; padding: 6px 10px; border-radius: 999px; }
+.pay-header nav button { cursor: pointer; }
+.pay-header nav button:hover { text-decoration: underline; }
+.pay-header .pay-current { background: var(--pay-green); color: #fff; font-weight: 700; }
+
+/* Pealkiri */
+.pay-main { max-width: 660px; margin: 0 auto; padding: 8px 16px 64px; }
+.pay-main h1 { margin: 16px 0 8px; text-align: center; font-size: 2rem; }
+.pay-lead { margin: 0 0 32px; text-align: center; font-size: 0.85rem; }
+
+/* Paigutus */
+.pay-layout { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 16px; align-items: start; }
+.pay-column { display: grid; gap: 16px; }
+
+/* Kaardid */
+.pay-card {
+  margin: 0;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--pay-line);
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgb(57 94 102 / 6%);
+  display: grid;
+  gap: 12px;
+}
+.pay-card legend { float: left; width: 100%; padding: 0; margin-bottom: 4px; font-weight: 700; font-size: 1.05rem; }
+
+/* Tarneviisid */
+.pay-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--pay-line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.pay-option:has(input:checked) { background: var(--pay-tint); border-color: var(--pay-green); }
+.pay-option input { margin-top: 3px; accent-color: var(--pay-green); }
+.pay-option-text { flex: 1; display: grid; gap: 2px; }
+.pay-option-text small { font-size: 0.7rem; }
+.pay-option-price { font-weight: 700; white-space: nowrap; }
+
+/* Andmed */
+.pay-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pay-fields label { display: grid; gap: 6px; font-size: 0.75rem; }
+.pay-wide { grid-column: 1 / -1; }
+.pay-fields input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 0.85rem;
+  color: inherit;
+  padding: 10px 12px;
+  border: 1px solid var(--pay-line);
+  border-radius: 8px;
+}
+.pay-fields input:focus-visible { outline: 2px solid var(--pay-green); outline-offset: 1px; }
+
+/* Makseviis */
+.pay-methods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.pay-methods button {
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: inherit;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid var(--pay-line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.pay-methods button[aria-pressed="true"] { background: var(--pay-tint); border-color: var(--pay-green); }
+.pay-note { margin: 0; font-size: 0.7rem; }
+
+/* Kokkuvõte */
+.pay-summary {
+  position: sticky;
+  top: 16px;
+  padding: 20px;
+  border-radius: 20px;
+  background: var(--pay-dark);
+  color: #fff;
+  display: grid;
+  gap: 14px;
+}
+.pay-summary h2 { margin: 0; font-size: 1.05rem; }
+.pay-book { padding: 10px 12px; border-radius: 10px; background: rgb(255 255 255 / 12%); display: grid; gap: 2px; }
+.pay-book small { font-size: 0.7rem; }
+.pay-summary dl { margin: 0; display: grid; gap: 10px; font-size: 0.75rem; }
+.pay-summary dl div { display: flex; justify-content: space-between; gap: 8px; }
+.pay-summary dd { margin: 0; font-weight: 700; white-space: nowrap; }
+.pay-summary .pay-total { padding-top: 14px; border-top: 1px solid rgb(255 255 255 / 25%); align-items: baseline; font-size: 0.9rem; font-weight: 700; }
+.pay-summary .pay-total dd { font-size: 1.3rem; }
+.pay-submit {
+  font: inherit;
+  font-weight: 700;
+  padding: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--pay-green);
+  color: #fff;
+  cursor: pointer;
+}
+.pay-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.pay-footnote { margin: 0; text-align: center; font-size: 0.7rem; }
+
+/* Mobiil */
+@media (max-width: 680px) {
+  .pay-layout,
+  .pay-fields { grid-template-columns: 1fr; }
+  .pay-summary { position: static; }
+  .pay-header { flex-direction: column; }
+}
