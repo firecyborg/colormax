@@ -14,10 +14,6 @@ export default function BookPage({ onHome, onAccount }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
-  const [checkout, setCheckout] = useState(false)
-  const [delivery, setDelivery] = useState('standard')
-  const [payment, setPayment] = useState('card')
-  const [customer, setCustomer] = useState({ name: '', email: '', address: '' })
   const preview = useRef(null)
   const order = useRef(null)
 
@@ -59,20 +55,6 @@ export default function BookPage({ onHome, onAccount }) {
   }
   const visible = pages.filter((page) => category === 'all' || String(page.category_id) === category)
   const total = 800 + selected.length * 45
-  const deliveryPrice = delivery === 'courier' ? 3900 : delivery === 'worldwide' ? 1000000 : 290
-  const grandTotal = total + deliveryPrice
-  const updateCustomer = (event) => setCustomer({ ...customer, [event.target.name]: event.target.value })
-
-  if (checkout) return <div className="book-page checkout-page">
-    <header className="book-header"><button className="book-logo" onClick={() => setCheckout(false)} aria-label="Tagasi raamatu juurde"><Logo /></button><nav aria-label="Tellimuse sammud"><button onClick={() => setCheckout(false)}>Tagasi kujunduse juurde</button><span>1. Leheküljed</span><span>2. Eelvaade</span><strong>3. Maksmine</strong></nav></header>
-    <main className="checkout-main"><div className="checkout-heading"><h1>Peaaegu valmis!</h1><p>Vali, kuidas sinu värviraamat sinuni jõuab.</p></div><div className="checkout-layout">
-      <div className="checkout-forms">
-        <section className="book-card"><h2>Kohaletoimetamine</h2><div className="delivery-options">{[['standard','Tavaline kuller','Raamat saabub, kui saabub. Tõenäoliselt varem kui tütre järgmine sünnipäev.',290],['courier','Asutaja toob kohale','Käsitsi, isiklikult ja pliiasid taskus. Ütleb ukse peal: tubli värvimist!',3900],['worldwide','Ülemaailmne asutaja-teenus','Asutaja toob raamatu käsitsi kohale, kus iganes sa oled.',1000000]].map(([id,label,description,price]) => <label className={`delivery-option ${delivery === id ? 'selected' : ''}`} key={id}><input type="radio" name="delivery" value={id} checked={delivery === id} onChange={() => setDelivery(id)} /><span><strong>{label}</strong><small>{description}</small></span><b>{money(price)}</b></label>)}</div></section>
-        <section className="book-card"><h2>Sinu andmed</h2><div className="customer-fields"><label>Nimi<input name="name" autoComplete="name" value={customer.name} onChange={updateCustomer} placeholder="Eesnimi Perenimi" required /></label><label>E-post<input name="email" type="email" autoComplete="email" value={customer.email} onChange={updateCustomer} placeholder="sinu@epost.ee" required /></label><label className="address-field">Aadress või koordinaadid<input name="address" autoComplete="street-address" value={customer.address} onChange={updateCustomer} placeholder="Tänav, maja" required /></label></div></section>
-        <section className="book-card"><h2>Makseviis</h2><div className="payment-options">{[['card','Pangakaart'],['link','Pangalink'],['invoice','Arve']].map(([id,label])=><button type="button" key={id} aria-pressed={payment === id} onClick={() => setPayment(id)}>{label}</button>)}</div><p className="checkout-note">Makse töötlemine lisatakse enne tellimuste vastuvõtmist.</p></section>
-      </div><aside className="checkout-summary"><h2>Sinu tellimus</h2><div className="checkout-book"><strong>{title.trim() || 'Minu värviraamat'}</strong><span>Isiklik värviraamat, {selected.length} lehekülge</span></div><dl><div><dt>Raamat ({selected.length} lk × {money(45)})</dt><dd>{money(total)}</dd></div><div><dt>{delivery === 'standard' ? 'Tavaline kuller' : delivery === 'courier' ? 'Asutaja toob kohale' : 'Ülemaailmne teenus'}</dt><dd>{money(deliveryPrice)}</dd></div><div className="checkout-total"><dt>Kokku</dt><dd>{money(grandTotal)}</dd></div></dl><button className="book-primary" onClick={() => { if (!customer.name || !customer.email || !customer.address) { document.querySelector('.customer-fields input:invalid')?.focus(); return } order.current.showModal() }}>Maksa {money(grandTotal)}</button><p>Turvaline makse lisandub peagi.</p></aside>
-    </div></main><dialog className="book-dialog" ref={order}><h2>Aitäh, {customer.name || 'sõber'}!</h2><p>Sinu {selected.length}-leheküljeline raamat on valmis. Makse töötlemine pole veel ühendatud, seega tellimust ega makset ei salvestatud.</p><form method="dialog"><button className="book-outline">Tagasi raamatu juurde</button></form></dialog>
-  </div>
 
   return <div className="book-page">
     <header className="book-header"><button className="book-logo" onClick={onHome} aria-label="Avaleht"><Logo /></button><nav aria-label="Peamenüü"><button onClick={onHome}>Avaleht</button><button aria-current="page">Uus raamat</button><button onClick={onAccount}>Konto sätted</button></nav></header>
@@ -92,7 +74,7 @@ export default function BookPage({ onHome, onAccount }) {
             <ol className="selected-pages">{selected.map((page, index) => <li key={page.id}><span>{index + 1}</span><img src={imageUrl(page)} alt="" /><strong>{page.title}</strong><button disabled={index === 0} onClick={() => move(index, -1)} aria-label={`Liiguta ${page.title} üles`}>↑</button><button disabled={index === selected.length - 1} onClick={() => move(index, 1)} aria-label={`Liiguta ${page.title} alla`}>↓</button><button className="remove-page" onClick={() => toggle(page)} aria-label={`Eemalda ${page.title}`}>×</button></li>)}</ol>
             <button className="book-outline" disabled={!selected.length} onClick={() => preview.current.showModal()}>Vaata eelvaadet</button>
           </section>
-          <section className="book-pricing" aria-labelledby="price-title"><h2 id="price-title">Hinnakokkuvõte</h2><dl><div><dt>Lehekülgi</dt><dd>{selected.length}</dd></div><div><dt>Alushind</dt><dd>{money(800)}</dd></div><div><dt>{selected.length} lk × {money(45)}</dt><dd>{money(selected.length * 45)}</dd></div><div className="book-total"><dt>Hind kokku</dt><dd>{money(total)}</dd></div></dl><button className="book-primary" disabled={!selected.length} onClick={() => setCheckout(true)}>Telli raamat <span aria-hidden="true">→</span></button><p className="book-price-note">Hind sisaldab raamatu koostamist</p></section>
+          <section className="book-pricing" aria-labelledby="price-title"><h2 id="price-title">Hinnakokkuvõte</h2><dl><div><dt>Lehekülgi</dt><dd>{selected.length}</dd></div><div><dt>Alushind</dt><dd>{money(800)}</dd></div><div><dt>{selected.length} lk × {money(45)}</dt><dd>{money(selected.length * 45)}</dd></div><div className="book-total"><dt>Hind kokku</dt><dd>{money(total)}</dd></div></dl><button className="book-primary" disabled={!selected.length} onClick={() => order.current.showModal()}>Telli raamat <span aria-hidden="true">→</span></button><p className="book-price-note">Näidishinnad · tellimuse vormistamine lisandub peagi</p></section>
         </aside>
       </div>
     </main>
