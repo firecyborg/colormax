@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { saveBook } from '../../api/book.js'
+import { registerOrder } from '../../api/order.js'
 import Logo from '../shared/components/Logo.jsx'
 import CheckoutPage from '../Checkout/CheckoutPage.jsx'
 import { BASE_PRICE, PAGE_PRICE, money } from '../shared/prices.js'
@@ -20,7 +20,7 @@ export default function BookPage({ onHome, onAccount }) {
   const [previewStep, setPreviewStep] = useState(false)
   const [previewPage, setPreviewPage] = useState(0)
   const preview = useRef(null)
-  const savingBook = useRef(false)
+  const submittingOrder = useRef(false)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -59,17 +59,18 @@ export default function BookPage({ onHome, onAccount }) {
     })
   }
 
-  async function handleSaveBook({ title, pageIds }) {
-    if (savingBook.current) return
+  async function handleRegisterOrder(orderDetails) {
+    if (submittingOrder.current) return
 
-    savingBook.current = true
+    submittingOrder.current = true
     try {
-      await saveBook(title, pageIds)
-      window.alert('Raamat on salvestatud.')
+      const order = await registerOrder(orderDetails)
+      window.alert(`Tellimus nr ${order.id} on salvestatud.`)
+      onHome()
     } catch (error) {
       window.alert(error.message)
     } finally {
-      savingBook.current = false
+      submittingOrder.current = false
     }
   }
 
@@ -82,7 +83,7 @@ export default function BookPage({ onHome, onAccount }) {
     onHome={onHome}
     onPages={() => { setCheckout(false); setPreviewStep(false) }}
     onPreview={() => { setCheckout(false); setPreviewStep(true) }}
-    onSubmit={handleSaveBook}
+    onSubmit={handleRegisterOrder}
   />
 
   if (previewStep) return <div className="book-page preview-step-page">

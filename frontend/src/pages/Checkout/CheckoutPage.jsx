@@ -130,7 +130,7 @@ export default function CheckoutPage({ title, pages, onHome, onPages, onPreview,
               <div className="pay-total"><dt>Kokku</dt><dd>{money(total)}</dd></div>
             </dl>
             <button type="submit" className="pay-submit" disabled={!pageCount}>
-              Maksa {money(total)}
+              Esita tellimus
             </button>
             {deliveryOption.footnote && <p className="pay-footnote">{deliveryOption.footnote}</p>}
           </aside>
