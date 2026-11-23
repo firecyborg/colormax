@@ -59,12 +59,27 @@ export default function App() {
         const result = await getAccountData()
 
         if (result === null) {
+            setAccount(null)
+            setScreen('login')
             throw new Error('Seanss puudub. Logi uuesti sisse.')
         }
 
         setAccount(toAccount(result.user))
         setScreen('settings')
         window.scrollTo(0, 0)
+    }
+
+    const openAccount = async () => {
+        if (!account) {
+            setScreen('login')
+            return
+        }
+
+        try {
+            await openSettings()
+        } catch (error) {
+            window.alert(error.message)
+        }
     }
 
     const logout = async () => {
@@ -100,9 +115,9 @@ export default function App() {
             </p>
         )
     }
-    if (screen === 'book') return <BookPage onHome={() => setScreen('home')} onAccount={() => setScreen(account ? 'settings' : 'login')} />
+    if (screen === 'book') return <BookPage onHome={() => setScreen('home')} onAccount={openAccount} />
 
-    if (screen === 'home') return <HomePage onCreate={() => setScreen('book')} onAccount={() => setScreen(account ? 'settings' : 'login')} />
+    if (screen === 'home') return <HomePage onCreate={() => setScreen('book')} onAccount={openAccount} />
 
     if (screen === 'settings') return <SettingsPage account={account} onLogout={logout} onDelete={processDelete} onHome={() => { setScreen('home'); window.scrollTo(0, 0) }} />
 

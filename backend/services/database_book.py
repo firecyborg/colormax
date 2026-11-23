@@ -1,6 +1,34 @@
 from flask import Blueprint, request, jsonify, session
 from database import get_connection
 from psycopg import Error
+
+
+def insert_book(cursor, title, pages, user_id):
+    """Salvesta raamat ja selle leheküljed pooleliolevas tehingus."""
+    cursor.execute(
+        """
+        INSERT INTO books (user_id, title)
+        VALUES (%s, %s)
+        RETURNING id, user_id, title
+        """,
+        (user_id, title),
+    )
+    book = cursor.fetchone()
+    created_pages = []
+    for position, page_id in enumerate(pages, start=1):
+        cursor.execute(
+            """
+            INSERT INTO book_pages (book_id, page_id, position)
+            VALUES (%s, %s, %s)
+            RETURNING page_id
+            """,
+            (book["id"], page_id, position),
+        )
+        created_pages.append(cursor.fetchone()["page_id"])
+
+    return book, created_pages
+
+
 def make_book_database(title, pages, length, user_id):
     """Make a book."""
 
@@ -21,34 +49,10 @@ def make_book_database(title, pages, length, user_id):
         return jsonify({"error": "Lehtede arv peab olema 1-20"}), 400
     if len(pages) != length:
         return jsonify({"error": "Lehtede arv ja raamatu pikkus peavad olema samad"}), 400
-    created_pages = []
     try:
         with get_connection() as connection:
             with connection.cursor() as cursor:
-                cursor.execute(
-                    """
-                    INSERT INTO books
-                        (user_id, title)
-                    VALUES (%s, %s) 
-                    RETURNING id, user_id, title
-                    """,
-                    (user_id, title),
-                )
-                book = cursor.fetchone()
-                book_id = book["id"]
-                for position, page_id in enumerate(pages, start=1):
-                    cursor.execute(
-                        """
-                        INSERT INTO book_pages
-                            (book_id, page_id, position)
-                        VALUES (%s, %s, %s)
-                        RETURNING page_id
-                        """,
-                        (book_id, page_id, position),
-                    )
-
-                    saved_page = cursor.fetchone()
-                    created_pages.append(saved_page["page_id"])
+                book, created_pages = insert_book(cursor, title, pages, user_id)
 
     except Error as error:
         print(error)

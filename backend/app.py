@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from API.api_account import account_bp
 from API.api_pages import pages_bp
 from API.api_book import book_bp
+from API.api_order import order_bp
 
 
 
@@ -15,6 +16,7 @@ def create_app():
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
     app.register_blueprint(account_bp)
     app.register_blueprint(book_bp)
+    app.register_blueprint(order_bp)
     return app
 
 if __name__ == "__main__":

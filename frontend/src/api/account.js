@@ -40,7 +40,7 @@ export async function LoginToAccount(values) {
 
 
 export async function getAccountData() {
-    const response = await fetch('/api/account/data', {})
+    const response = await fetch('/api/account/data', { cache: 'no-store' })
     if (response.status === 401) {
         return null
     }
