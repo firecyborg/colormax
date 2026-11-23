@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { saveBook } from '../../api/book.js'
 import Logo from '../shared/components/Logo.jsx'
 import CheckoutPage from '../Checkout/CheckoutPage.jsx'
 import { BASE_PRICE, PAGE_PRICE, money } from '../shared/prices.js'
@@ -19,6 +20,7 @@ export default function BookPage({ onHome, onAccount }) {
   const [previewStep, setPreviewStep] = useState(false)
   const [previewPage, setPreviewPage] = useState(0)
   const preview = useRef(null)
+  const savingBook = useRef(false)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -56,6 +58,21 @@ export default function BookPage({ onHome, onAccount }) {
       return next
     })
   }
+
+  async function handleSaveBook({ title, pageIds }) {
+    if (savingBook.current) return
+
+    savingBook.current = true
+    try {
+      await saveBook(title, pageIds)
+      window.alert('Raamat on salvestatud.')
+    } catch (error) {
+      window.alert(error.message)
+    } finally {
+      savingBook.current = false
+    }
+  }
+
   const visible = pages.filter((page) => category === 'all' || String(page.category_id) === category)
   const total = BASE_PRICE + selected.length * PAGE_PRICE
 
@@ -65,14 +82,66 @@ export default function BookPage({ onHome, onAccount }) {
     onHome={onHome}
     onPages={() => { setCheckout(false); setPreviewStep(false) }}
     onPreview={() => { setCheckout(false); setPreviewStep(true) }}
-    onSubmit={(order) => console.log('Tellimus:', order)}
+    onSubmit={handleSaveBook}
   />
 
   if (previewStep) return <div className="book-page preview-step-page">
     <header className="book-header"><button className="book-logo" onClick={() => setPreviewStep(false)} aria-label="Tagasi lehekülgi valima"><Logo /></button><nav aria-label="Tellimuse sammud"><button onClick={() => setPreviewStep(false)}>Tagasi kujunduse juurde</button><strong>1. Leheküljed</strong><span aria-current="step">2. Eelvaade</span><span>3. Maksmine</span></nav></header>
     <main className="preview-step-main"><div className="checkout-heading"><h1>Vaata oma värviraamatut</h1><p>Kontrolli pilte ja järjekorda enne tellimuse vormistamist.</p></div>
       {!selected.length ? <section className="preview-empty book-card"><span aria-hidden="true">＋</span><h2>Sinu raamat ootab pilte</h2><p>Vali pildikogust mõned leheküljed, siis saad oma raamatut eelvaates sirvida.</p><button className="book-primary" onClick={() => setPreviewStep(false)}>Lisa pilte</button></section> : <div className="preview-step-layout">
-        <section className="book-preview-stage" aria-label="Raamatu eelvaade"><div className="preview-book"><div className="preview-book-spread"><article className="preview-book-page preview-left-page"><span className="preview-page-number">{previewPage + 1}</span><img src={imageUrl(selected[previewPage])} alt={selected[previewPage].title} /><strong>{selected[previewPage].title}</strong></article><article className="preview-book-page preview-right-page">{selected[previewPage + 1] ? <><span className="preview-page-number">{previewPage + 2}</span><img src={imageUrl(selected[previewPage + 1])} alt={selected[previewPage + 1].title} /><strong>{selected[previewPage + 1].title}</strong></> : <div className="preview-last-page"><Logo /><strong>{title.trim() || 'Minu värviraamat'}</strong><span>Siin algavad sinu lood</span></div>}</article></div></div><div className="preview-controls"><button type="button" className="book-outline" disabled={previewPage === 0} onClick={() => setPreviewPage(Math.max(0, previewPage - 2))}>← Eelmised lehed</button><span aria-live="polite">{previewPage + 1}–{Math.min(previewPage + 2, selected.length)} / {selected.length}</span><button type="button" className="book-outline" disabled={previewPage + 2 >= selected.length} onClick={() => setPreviewPage(Math.min(selected.length - 1, previewPage + 2))}>Järgmised lehed →</button></div><div className="preview-thumbnails" aria-label="Valitud leheküljed">{selected.map((page,index)=><button type="button" key={page.id} aria-label={`Ava lehekülg ${index + 1}: ${page.title}`} aria-current={index === previewPage || index === previewPage + 1 ? 'page' : undefined} onClick={() => setPreviewPage(index % 2 === 0 ? index : index - 1)}><img src={imageUrl(page)} alt="" /><span>{index + 1}</span></button>)}</div></section>
+        <section className="book-preview-stage" aria-label="Raamatu eelvaade">
+          <div className="preview-book">
+            <div className="preview-book-spread">
+              <article className="preview-book-page preview-left-page">
+                <span className="preview-page-number">{previewPage + 1}</span>
+                <img src={imageUrl(selected[previewPage])} alt={selected[previewPage].title} />
+                <strong>{selected[previewPage].title}</strong>
+              </article>
+              <article className="preview-book-page preview-right-page">
+                {selected[previewPage + 1] ? (
+                  <>
+                    <span className="preview-page-number">{previewPage + 2}</span>
+                    <img src={imageUrl(selected[previewPage + 1])} alt={selected[previewPage + 1].title} />
+                    <strong>{selected[previewPage + 1].title}</strong>
+                  </>
+                ) : (
+                  <div className="preview-last-page">
+                    <Logo />
+                    <strong>{title.trim() || 'Minu värviraamat'}</strong>
+                    <span>Siin algavad sinu lood</span>
+                  </div>
+                )}
+              </article>
+            </div>
+          </div>
+
+          <div className="preview-controls">
+            <button type="button" className="book-outline" disabled={previewPage === 0} onClick={() => setPreviewPage(Math.max(0, previewPage - 2))}>
+              ← Eelmised lehed
+            </button>
+            <span aria-live="polite">
+              {previewPage + 1}–{Math.min(previewPage + 2, selected.length)} / {selected.length}
+            </span>
+            <button type="button" className="book-outline" disabled={previewPage + 2 >= selected.length} onClick={() => setPreviewPage(Math.min(selected.length - 1, previewPage + 2))}>
+              Järgmised lehed →
+            </button>
+          </div>
+
+          <div className="preview-thumbnails" aria-label="Valitud leheküljed">
+            {selected.map((page, index) => (
+              <button
+                type="button"
+                key={page.id}
+                aria-label={`Ava lehekülg ${index + 1}: ${page.title}`}
+                aria-current={index === previewPage || index === previewPage + 1 ? 'page' : undefined}
+                onClick={() => setPreviewPage(index % 2 === 0 ? index : index - 1)}
+              >
+                <img src={imageUrl(page)} alt="" />
+                <span>{index + 1}</span>
+              </button>
+            ))}
+          </div>
+        </section>
         <aside className="preview-order-card"><h2>Sinu raamat</h2><div className="preview-cover"><Logo /><strong>{title.trim() || 'Minu värviraamat'}</strong><span>{selected.length} värvimislehekülge</span></div><dl><div><dt>Lehekülgi</dt><dd>{selected.length}</dd></div><div><dt>Raamatu hind</dt><dd>{money(total)}</dd></div></dl><button type="button" className="book-outline" onClick={() => setPreviewStep(false)}>Muuda pilte</button><button type="button" className="book-primary" onClick={() => setCheckout(true)}>Jätka tellimusega <span aria-hidden="true">→</span></button></aside>
       </div>}
     </main>

@@ -27,7 +27,7 @@ export default function CheckoutPage({ title, pages, onHome, onPages, onPreview,
   const updateCustomer = (event) =>
     setCustomer({ ...customer, [event.target.name]: event.target.value })
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
     onSubmit({
       title: title.trim(),
