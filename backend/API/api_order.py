@@ -7,6 +7,10 @@ order_bp = Blueprint('order', __name__, url_prefix='/api/order')
 
 @order_bp.route('/register_order', methods=['POST'])
 def register_order():
+    user_id = session.get("user_id")
+    if user_id is None:
+        return jsonify({"error": "Tellimiseks pead olema sisse logitud."}), 401
+
     data = request.get_json(silent=True)
     if not isinstance(data, dict):
         return jsonify({"error": "Vigased tellimuse andmed."}), 400
@@ -17,5 +21,5 @@ def register_order():
         delivery=data.get("delivery"),
         payment=data.get("payment"),
         customer=data.get("customer"),
-        user_id=session.get("user_id"),
+        user_id=user_id,
     )

@@ -24,10 +24,10 @@ CREATE TABLE IF NOT EXISTS coloring_pages (
     file_path   VARCHAR(255) NOT NULL UNIQUE
 );
 
--- Koostatud raamat (user_id võib puududa, kui koostatakse ilma kontota)
+-- Koostatud raamat (On vaja kontot)
 CREATE TABLE IF NOT EXISTS books (
     id         SERIAL PRIMARY KEY,
-    user_id    INTEGER      REFERENCES users(id) ON DELETE CASCADE,
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     title      VARCHAR(150) NOT NULL,
     created_at TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
@@ -42,10 +42,10 @@ CREATE TABLE IF NOT EXISTS book_pages (
 );
 
 
--- Tellimused (user_id võib puududa, kui tellitakse ilma kontota)
+-- Tellimused (On vaja kontot)
 CREATE TABLE IF NOT EXISTS orders (
     id              SERIAL PRIMARY KEY,
-    user_id         INTEGER       REFERENCES users(id) ON DELETE SET NULL,
+    user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     book_id         INTEGER       NOT NULL REFERENCES books(id),
     customer_name   VARCHAR(100)  NOT NULL,
     customer_email  VARCHAR(255)  NOT NULL,
