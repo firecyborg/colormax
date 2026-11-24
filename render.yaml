@@ -2,7 +2,7 @@ services:
   - type: web
     name: colormax
     runtime: docker
-    branch: 84-hostimine-veebis
+    branch: main
     plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
