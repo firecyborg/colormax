@@ -130,9 +130,9 @@ export default function App() {
             <button type="button" aria-pressed={registration} onClick={() => setScreen('register')}>Loo konto</button>
         </nav>
         {registration ? (
-            <RegisterPage onContinue={openSettings} onLogin={() => setScreen('login')} />
+            <RegisterPage onContinue={openSettings} onLogin={() => setScreen('login')} onHome={() => { setScreen('home'); window.scrollTo(0, 0) }} />
         ) : (
-            <LoginPage onContinue={openSettings} onRegister={() => setScreen('register')} />
+            <LoginPage onContinue={openSettings} onRegister={() => setScreen('register')} onHome={() => { setScreen('home'); window.scrollTo(0, 0) }} />
         )}
         </main>
     )

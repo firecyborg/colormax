@@ -45,6 +45,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid #3e626b; outline-
   background: white;
 }
 .brand-mark { display: block; width: 72px; height: 72px; margin: 0 auto; }
+.auth-home { display: block; width: fit-content; margin: 0 auto; padding: 0; border: 0; border-radius: 8px; background: transparent; cursor: pointer; }
+.auth-home:focus-visible { outline: 3px solid #25c415; outline-offset: 4px; }
 .login-card { padding: 66px 68px 22px; }
 .welcome { text-align: center; margin: 16px -30px 46px; }
 .welcome h1 { font-size: 38px; font-weight: 400; line-height: 1.2; margin: 0 0 20px; letter-spacing: -.5px; }

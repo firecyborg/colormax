@@ -1,10 +1,10 @@
 import Logo from '../shared/components/Logo.jsx'
 import RegisterForm from './components/RegisterForm.jsx'
 
-export default function RegisterPage({ onLogin, onContinue }) {
+export default function RegisterPage({ onLogin, onContinue, onHome }) {
   return (
     <section className="auth-card register-card" aria-label="Konto loomine">
-      <Logo />
+      <button className="auth-home" type="button" onClick={onHome} aria-label="Avaleht"><Logo /></button>
       <RegisterForm onContinue={onContinue} />
       <footer className="auth-footer">
         <span>Juba konto olemas?</span>

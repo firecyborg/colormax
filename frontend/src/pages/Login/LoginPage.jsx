@@ -1,10 +1,10 @@
 import Logo from '../shared/components/Logo.jsx'
 import LoginForm from './components/LoginForm.jsx'
 
-export default function LoginPage({ onRegister, onContinue }) {
+export default function LoginPage({ onRegister, onContinue, onHome }) {
   return (
     <section className="auth-card login-card" aria-label="Sisselogimine">
-      <Logo />
+      <button className="auth-home" type="button" onClick={onHome} aria-label="Avaleht"><Logo /></button>
       <header className="welcome">
         <h1>Tere tulemast tagasi</h1>
         <p>Logi enda kontosse sisse, et jätkata</p>
