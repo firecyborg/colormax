@@ -1,49 +1,72 @@
 # Colormax
 
-Colormax on värviraamatute veebirakenduse prototüüp. Kasutajaliides on loodud Reacti ja Vitega, server Flaskiga ning PostgreSQL-i ühenduse jaoks on lisatud Psycopgi abimoodul.
+Colormax on Reacti ja Flaski põhinev veebirakendus, kus kasutaja saab sirvida värvimislehti, luua värviraamatu ja esitada tellimuse. Kasutajaliides kasutab Vitet ning server salvestab konto-, raamatu- ja tellimuseandmed PostgreSQL-i andmebaasi.
 
-## Praegune seis
+## Funktsioonid
 
-- Kasutajaliideses on sisselogimise, registreerimise ja konto sätete vaated.
-- Sisselogimine ja registreerimine avavad kohaliku demoseansi ka tühjade või vigaste andmetega. Vormid ei kutsu praegu konto API-t.
-- Sisselogimisel kuvatakse Mari näidisandmeid. Registreerimisel kasutatakse sisestatud nime, e-posti ja sünnipäeva; tühjad väljad asendatakse näidisandmetega.
-- Konto andmed püsivad ainult Reacti mälus. Lehe värskendamine avab uuesti sisselogimise; paroole ei saadeta serverisse ega salvestata.
-- Tellimused ja värviraamatud on staatilised näited. „Telli uuesti” ja „Loo uus värviraamat” kuvavad teate, et toiming pole ühendatud.
-- „Logi välja” lõpetab demoseansi. „Kustuta konto” küsib kinnitust ja lõpetab samuti ainult demoseansi.
-- „Jäta mind meelde” ja „Unustasid parooli?” funktsionaalsus pole ühendatud.
-- Serveri sisselogimine ja registreerimine kasutavad PostgreSQL-i andmebaasi. Ülejäänud konto otspunktid kasutavad endiselt näidisandmeid või tagastavad ainult õnnestumise teate. Kasutajaliides pole nende otspunktidega ühendatud.
+- Kasutajakonto registreerimine, sisselogimine, väljalogimine ja kustutamine.
+- Konto loomisel kontrollitakse sisestatud andmeid ning parool salvestatakse räsituna.
+- Värvimislehtede ja kategooriate sirvimine ning otsing.
+- Värviraamatu loomine valitud lehtedest ja tellimuse esitamine.
+- Kontoga seotud raamatute ning tellimuste kuvamine.
+- Kasutajaliidese arendusaegne demovaade on võimalik avada ka andmebaasita, kuid andmeid salvestavad funktsioonid vajavad töötavat API-t ja andmebaasi.
 
 ## Projekti struktuur
 
 ```text
 backend/
-  app.py                  Flaski rakendus ja konto API registreerimine
-  API/api_account.py      Konto API otspunktid
-  database.py             PostgreSQL-i ühenduse abifunktsioonid
-  services/database_account.py  Sisselogimine ja registreerimine andmebaasis
-  schema.sql              Andmebaasitabelite definitsioonid
-  .env.example            Andmebaasi seadistuse näidis
-  requirements.txt        Pythoni sõltuvused
+  app.py                       Flaski rakendus
+  API/                         Konto, lehtede, raamatu ja tellimuse otspunktid
+  services/                    Andmebaasipäringud ja rakenduse loogika
+  database.py                  PostgreSQL-i ühendus
+  schema.sql                   Andmebaasitabelite definitsioonid
+  seed.sql                     Näidisandmed
+  .env.example                 Keskkonnamuutujate näidis
+  requirements.txt             Pythoni sõltuvused
 frontend/
-  src/App.jsx             Vaadete vahetamine ja demoseansi olek
-  src/pages/Login/        Sisselogimisvaade
-  src/pages/Register/     Registreerimisvaade
-  src/pages/Settings/     Konto sätted
-  src/pages/shared/       Jagatud komponendid
-  vite.config.js          Arendusserver ja API puhverserver
-Pildid/                   Autode, kosmose, loomade ja muinasjutu pildid
-Projekti kirjeldused/      Projektiplaan, disainijuhis ja muud kirjeldused
+  src/                         Reacti kasutajaliides ja API-kliendid
+Pildid/                        Rakenduse värvimislehtede pildid
+Projekti kirjeldused/          Projektiplaan ja disainimaterjalid
+Dockerfile                     Renderi konteineriehitus
+render.yaml                    Renderi Blueprinti seadistus
 ```
 
-## Vajalik tarkvara
+## Eeldused
 
-- Python 3.13 (projekti arenduses kasutatav versioon).
-- Node.js ja npm. Vite 8 jaoks kasuta Node.js versiooni 20.19+ või 22.12+.
-- Ligipääs projekti Neoni PostgreSQL-i andmebaasile serveri sisselogimise ja registreerimise kasutamiseks. Kasutajaliidese demovaate jaoks pole andmebaasi vaja.
+- Python 3.13.
+- Node.js 22.12+ (või 20.19+) ja npm.
+- PostgreSQL-i andmebaas. Kohalikuks arenduseks sobib näiteks Neon.
 
-## Kasutajaliidese käivitamine
+## Seadistamine
 
-Käivita projekti juurkaustast:
+Kõik järgnevad käsud eeldavad, et alustad repo juurkaustast. Loo `backend`-kaustas keskkonnafail näidisfaili põhjal ja täida andmebaasiühendus ning seansivõti:
+
+```sh
+cd backend
+cp .env.example .env
+```
+
+Windows PowerShellis kasuta kopeerimiseks käsku `Copy-Item .env.example .env`.
+
+Muuda `backend/.env` sisu:
+
+```dotenv
+DATABASE_URL="postgresql://KASUTAJA:PAROOL@HOST/neondb?sslmode=require&channel_binding=require"
+SECRET_KEY="siia-pane-juhuslik-pikk-voti"
+```
+
+Genereeri salajane võti näiteks käsuga `python -c "import secrets; print(secrets.token_hex(32))"`. Ära lisa päris `.env` faili versioonihaldusse. Andmebaasi tabelid ja värvimislehtede näidisandmed saad luua PostgreSQL-i `psql` käsureatööriistaga (kasuta oma andmebaasi ühendusaadressi):
+
+```sh
+psql "$DATABASE_URL" -f backend/schema.sql
+psql "$DATABASE_URL" -f backend/seed.sql
+```
+
+Projektis pole automaatset migratsioonisüsteemi.
+
+## Käivitamine arenduses
+
+Paigalda ja käivita kasutajaliides (repo juurkaustast):
 
 ```sh
 cd frontend
@@ -51,102 +74,60 @@ npm ci
 npm run dev
 ```
 
-Windowsi PowerShellis võib vajadusel kasutada `npm` asemel `npm.cmd`.
+Vite kasutab aadressi <http://127.0.0.1:5174> (samuti töötab `http://localhost:5174`). Port 5174 peab olema vaba. API päringud suunatakse arenduses Flaski aadressile `http://127.0.0.1:5000`.
 
-Arendusserver avab aadressi <http://127.0.0.1:5174>. Port 5174 on fikseeritud (`strictPort: true`): kui see on hõivatud, vabasta port ja käivita server uuesti. Serveri peatamiseks vajuta `Ctrl+C`.
-
-Demovaate vaatamiseks piisab ainult kasutajaliidese käivitamisest. Vite suunab `/api` algusega päringud aadressile `http://127.0.0.1:5000`; nende päringute jaoks peab töötama ka Flask.
-
-## Serveri käivitamine
-
-Ava teine terminal projekti juurkaustas.
-
-### Windows PowerShell
-
-```powershell
-cd backend
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe app.py
-```
-
-### macOS / Linux
+Käivita server teises terminalis, samuti repo juurkaustast. Loo virtuaalkeskkond:
 
 ```sh
-cd backend
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python app.py
+python -m venv backend/.venv
 ```
 
-Flask töötab aadressil <http://127.0.0.1:5000> silumisrežiimis. See käivitusviis on mõeldud kohalikuks arenduseks.
-
-PyCharmis vali interpretaatoriks Windowsis `backend/.venv/Scripts/python.exe` või macOS-is/Linuxis `backend/.venv/bin/python`.
-
-### Andmebaasi seadistamine
-
-Projekti andmebaas asub Neonis ja tabelid on seal juba loodud. Küsi ühendusaadress tiimikaaslaselt või kopeeri see Neoni projekti Connect-vaatest ilma connection poolinguta. Kopeeri `backend`-kaustas näidisfail:
-
-```powershell
-# Windows PowerShell
-Copy-Item .env.example .env
-```
+macOS/Linux:
 
 ```sh
-# macOS / Linux
-cp .env.example .env
+backend/.venv/bin/python -m pip install -r backend/requirements.txt
+backend/.venv/bin/python backend/app.py
 ```
 
-Määra `.env` failis projekti Neoni ühendusaadress ja SECRET KEY login seanssiks:
+Windows PowerShell:
 
-```dotenv
-DATABASE_URL="postgresql://KASUTAJA:PAROOL@HOST/neondb?sslmode=require&channel_binding=require"
-SECRET_KEY=(python -c "import secrets; print(secrets.token_hex(32))" kasutage seda et saada suvaline võti)
+```powershell
+backend\.venv\Scripts\python.exe -m pip install -r backend\requirements.txt
+backend\.venv\Scripts\python.exe backend\app.py
 ```
 
-`database.py` loeb seadistuse `backend/.env` failist. `.env` on Gitist välja jäetud. Tabelite definitsioonid asuvad failis `backend/schema.sql`; skeemimuudatused rakenda Neoni SQL Editoris. Automaatset migratsioonisüsteemi projektis ei ole. 
+Flask kuulab aadressil <http://127.0.0.1:5000> (samuti `http://localhost:5000`). Konto ja tellimuse andmeid salvestavad funktsioonid vajavad kehtivat `DATABASE_URL` väärtust ning loodud andmebaasitabeleid. Sirvimislehtede API vajab samuti tabelite ja näidisandmete olemasolu. `backend/.env.example` sisaldab näidisväärtusi; asenda need oma andmebaasi andmetega.
 
-App.py loeb SECRET KEYd login seanssi loomiseks. Asendage SEXRET_KEY väärtus python -c "import secrets; print(secrets.token_hex(32))" terminalist saadud väärtusega.
+## API ülevaade
 
-## Konto API
-
-Kõigi otspunktide eesliide on `/api/account`. POST- ja PATCH-päringute sisu saada JSON-ina päisega `Content-Type: application/json`.
-
-| Meetod | Teekond | Praegune käitumine |
+| Meetod | Otspunkt | Kirjeldus |
 | --- | --- | --- |
-| GET | `/data?username=Mari` | Tagastab kasutajanime ning raamatu ja tellimuse näidisandmed. |
-| POST | `/login` | Otsib `username` välja järgi kasutajanime või e-posti andmebaasist ja kontrollib `password` väärtust; vale paari korral tagastab 401. |
-| POST | `/logout` | Tagastab õnnestumise teate. |
-| POST | `/register` | Salvestab kasutaja andmebaasi väljadega `username`, `password`, `email` ja `birthday`. Sünnipäev peab olema kujul `pp/kk/aaaa`; valideerimisvead tagastavad 400 ja olemasolev kasutajanimi või e-post 409. |
-| PATCH | `/change_password` | Nõuab mittetühje tekstivälju `previous_password` ja `new_password`. Praeguse parooli näidisväärtus on `1234`; uut parooli ei salvestata. |
-| DELETE | `/delete` | Tagastab kustutamise teate; andmeid ei kustutata. |
+| GET | `/api/account/data` | Tagastab sisselogitud konto, raamatud ja tellimused. Vajab seanssi. |
+| POST | `/api/account/register` | Loob konto (`username`, `password`, `email`, `birthday`) ja alustab seansi. Sünnipäevavorming on `pp/kk/aaaa`. |
+| POST | `/api/account/login` | Logib sisse kasutajanime või e-posti ja parooliga. |
+| POST | `/api/account/logout` | Lõpetab seansi. |
+| DELETE | `/api/account/delete` | Kustutab sisselogitud konto ning sellega seotud tellimused ja raamatud. |
+| PATCH | `/api/account/change_password` | Praegu näidisloogika: kontrollib fikseeritud praegust parooli `1234`; uut parooli andmebaasi ei salvesta. |
+| GET | `/api/categories` | Tagastab värvimislehtede kategooriad. |
+| GET | `/api/pages` | Tagastab värvimislehed; toetab valikulist `category` parameetrit. |
+| GET | `/api/images/<failitee>` | Annab värvimislehe pildi. |
+| POST | `/api/book/make_book` | Loob sisselogitud kasutajale värviraamatu. |
+| POST | `/api/order/register_order` | Esitab sisselogitud kasutaja tellimuse. |
 
-Serveri sisselogimine eeldab andmebaasis olevat kasutajat. Kasutajaliidese demosse pääsemiseks serveri kontot vaja ei ole. Serveri praegune teostus salvestab parooli `password_hash` veergu muutmata kujul ja võrdleb seda otse; paroolide räsimine ja autentimisseansi loomine vajavad veel teostamist.
+POST- ja PATCH-päringute sisu saada JSON-ina päisega `Content-Type: application/json`. Konto API kasutab Flaski küpsisega seanssi. Paroolid räsitakse registreerimisel ning kontrollitakse sisselogimisel.
 
-## Kontrollimine
+## Kasulikud käsud
 
 Käivita `frontend`-kaustas:
 
 ```sh
 npm run lint
 npm run build
+npm run preview
 ```
 
-Tootmisjärgu failid tekivad kausta `frontend/dist`. Koostatud kasutajaliidese kohalikuks eelvaateks kasuta `npm run preview`. `/api` puhverserver on seadistatud arendusserverile; tootmiskeskkonna API suunamine vajab eraldi seadistust.
+`build` loob tootmisfailid kausta `frontend/dist`; `preview` näitab neid lokaalselt. `/api` puhverserver on seadistatud Vite arendusserveris ning saadab päringud Flaskile. Värvimislehtede filtriks kasuta `/api/pages?category=1` (kategooria ID).
 
-Käsitsi kontrollimiseks:
+## Avaldamine Renderis
 
-1. Ava konto sätted nii sisselogimise kui ka registreerimise vormilt.
-2. Sisesta registreerimisel oma nimi, e-post ja sünnipäev ning kontrolli nende kuvamist sätetes.
-3. Kontrolli päise menüüd, näidistoimingute teateid ja väljalogimist.
-4. Proovi konto kustutamise kinnitamist ja tühistamist.
-5. Värskenda lehte ja kontrolli, et demoseanss lõpeb.
-6. Kontrolli mobiilivaadet laiustel 320–498 px ja töölauavaadet.
-
-Projektis ei ole praegu automaattestide käivitamise skripti.
-
-## Tasuta prooviversiooni avaldamine Renderis
-
-Repo juurkausta `render.yaml` ja `Dockerfile` seadistavad Reacti kasutajaliidese ning Flaski API üheks Renderi veebiteenuseks. Pärast Renderis GitLabi repo ühendamist avaldatakse rakendus tasuta aadressil `*.onrender.com`. Teenus vajab Renderis keskkonnamuutujaid `DATABASE_URL` (Neoni PostgreSQL-i ühendusaadress) ja `SECRET_KEY` (juhuslik pikk võti); Blueprint küsib nende väärtused loomisel.
-
-Enne avaldamist lükka haru `codex/book-preview-step` koos viimaste muudatustega GitLabi. Seejärel vali Renderis **New → Blueprint**, ühenda GitLab ja vali see repo ning haru. Esimene ehitus võib võtta mõne minuti. Tasuta veebiteenus võib pärast jõudeolekut uinuda ja järgmise avamise ajal uuesti käivituda. Hiljem saab Renderi teenusele lisada oma domeeni.
+Repo juurkausta `render.yaml` ja `Dockerfile` ehitavad kasutajaliidese ja Flaski API üheks veebiteenuseks. Renderi Blueprint kasutab harus `84-hostimine-veebis` ning vajab keskkonnamuutujaid `DATABASE_URL` ja `SECRET_KEY`. Ühenda Renderis GitLabi hoidla, vali **New → Blueprint** ja seadista mõlemad väärtused. Tasuta teenus võib jõudeoleku järel uinuda ning järgmisel avamisel uuesti käivituda.
