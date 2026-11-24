@@ -40,6 +40,9 @@ def make_book_database(title, pages, length, user_id):
     if len(title) > 100:
         return jsonify({"error": "Pealkiri võib olla kuni 100 märki"}), 400
 
+    if not isinstance(pages, list) or any(type(page) is not int for page in pages):
+        return jsonify({"error": "Lehed peavad olema täisarvude list."}), 400
+
     if len(set(pages)) != len(pages):
         return jsonify({"error": "Lehed peavad olema unikaalsed."}), 400
 
@@ -52,6 +55,12 @@ def make_book_database(title, pages, length, user_id):
     try:
         with get_connection() as connection:
             with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT id FROM coloring_pages WHERE id = ANY(%s)",
+                    (pages,),
+                )
+                if len(cursor.fetchall()) != len(pages):
+                    return jsonify({"error": "Vähemalt üks valitud lehekülg puudub."}), 400
                 book, created_pages = insert_book(cursor, title, pages, user_id)
 
     except Error as error:

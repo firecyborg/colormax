@@ -8,7 +8,7 @@ from flask import session
 """Connect functions with database."""
 
 from flask import Blueprint, request, jsonify
-from datetime import datetime
+from datetime import datetime, date
 
 def login_database(username, password):
     """Login."""
@@ -55,10 +55,15 @@ def register_database(username, password, email, birthday):
         return jsonify({"error": "Email võib olla kuni 255 märki"}), 400
 
     try:
-        datetime.strptime(birthday, "%d/%m/%Y")
+        birthday_date = datetime.strptime(birthday, "%d/%m/%Y").date()
     except (ValueError, TypeError):
         return jsonify({"error": "Sisesta korrektne sünnikuupäev kujul pp/kk/aaaa."}), 400
-    birthday_date = datetime.strptime(birthday, "%d/%m/%Y").date()
+
+    if birthday_date > date.today():
+        return jsonify({"error": "Sisesta korrektne sünnikuupäev"}), 400
+    if birthday_date.year < 1900:
+        return jsonify({"error": "Sisesta korrektne sünnikuupäev"}), 400
+
 
     password_hash = generate_password_hash(password)
 
