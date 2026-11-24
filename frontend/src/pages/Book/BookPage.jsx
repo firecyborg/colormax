@@ -6,22 +6,35 @@ import { BASE_PRICE, PAGE_PRICE, money } from '../shared/prices.js'
 import './BookPage.css'
 
 const imageUrl = (page) => `/api/images/${page.file_path.split('/').map(encodeURIComponent).join('/')}`
+const DRAFT_KEY = "draftBook"
 
-export default function BookPage({ onHome, onAccount }) {
+function readDraft() {
+  try {
+    return JSON.parse(sessionStorage.getItem(DRAFT_KEY))
+  } catch {
+    return null
+  }
+}
+
+export default function BookPage({ onHome, onAccount, account, onLogin }) {
+  const [draft] = useState(readDraft)
   const [pages, setPages] = useState([])
   const [categories, setCategories] = useState([])
   const [category, setCategory] = useState('all')
-  const [selected, setSelected] = useState([])
-  const [title, setTitle] = useState('')
+  const [selected, setSelected] = useState(draft?.selected ?? [])
+  const [title, setTitle] = useState(draft?.title ?? "")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
-  const [checkout, setCheckout] = useState(false)
+  const [checkout, setCheckout] = useState(Boolean(account && draft?.toCheckout))
   const [previewStep, setPreviewStep] = useState(false)
   const [previewPage, setPreviewPage] = useState(0)
   const preview = useRef(null)
   const submittingOrder = useRef(false)
 
+  useEffect(() => {
+  sessionStorage.removeItem(DRAFT_KEY)
+  }, [])
   useEffect(() => {
     const controller = new AbortController()
     async function load() {
@@ -57,6 +70,15 @@ export default function BookPage({ onHome, onAccount }) {
       ;[next[index], next[destination]] = [next[destination], next[index]]
       return next
     })
+  }
+
+  function goToCheckout() {
+  if (!account) {
+    sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ title, selected, toCheckout: true }))
+    onLogin()
+    return
+  }
+  setCheckout(true)
   }
 
   async function handleRegisterOrder(orderDetails) {
@@ -143,7 +165,7 @@ export default function BookPage({ onHome, onAccount }) {
             ))}
           </div>
         </section>
-        <aside className="preview-order-card"><h2>Sinu raamat</h2><div className="preview-cover"><Logo /><strong>{title.trim() || 'Minu värviraamat'}</strong><span>{selected.length} värvimislehekülge</span></div><dl><div><dt>Lehekülgi</dt><dd>{selected.length}</dd></div><div><dt>Raamatu hind</dt><dd>{money(total)}</dd></div></dl><button type="button" className="book-outline" onClick={() => setPreviewStep(false)}>Muuda pilte</button><button type="button" className="book-primary" onClick={() => setCheckout(true)}>Jätka tellimusega <span aria-hidden="true">→</span></button></aside>
+        <aside className="preview-order-card"><h2>Sinu raamat</h2><div className="preview-cover"><Logo /><strong>{title.trim() || 'Minu värviraamat'}</strong><span>{selected.length} värvimislehekülge</span></div><dl><div><dt>Lehekülgi</dt><dd>{selected.length}</dd></div><div><dt>Raamatu hind</dt><dd>{money(total)}</dd></div></dl><button type="button" className="book-outline" onClick={() => setPreviewStep(false)}>Muuda pilte</button><button type="button" className="book-primary" onClick={goToCheckout}>Jätka tellimusega <span aria-hidden="true">→</span></button></aside>
       </div>}
     </main>
   </div>

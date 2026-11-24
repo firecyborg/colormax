@@ -22,6 +22,7 @@ export default function App() {
     const [account, setAccount] = useState(null)
     const [isCheckingSession, setIsCheckingSession] = useState(true)
     const [sessionError, setSessionError] = useState('')
+    const [returnTo, setReturnTo] = useState(null)
 
     useEffect(() => {
         let active = true
@@ -67,6 +68,23 @@ export default function App() {
         setAccount(toAccount(result.user))
         setScreen('settings')
         window.scrollTo(0, 0)
+    }
+
+    const afterLogin = async () => {
+        if (returnTo !== "book") {
+            await openSettings()
+            return
+        }
+
+        const result = await getAccountData()
+        if (result == null) {
+            throw new Error("Seanss puudub. Logi uuesti sisse.")
+        }
+
+        setAccount(toAccount(result.user))
+        setReturnTo(null)
+        setScreen("book")
+        window.scrollTo (0, 0)
     }
 
     const openAccount = async () => {
@@ -115,7 +133,12 @@ export default function App() {
             </p>
         )
     }
-    if (screen === 'book') return <BookPage onHome={() => setScreen('home')} onAccount={openAccount} />
+    if (screen === 'book') return <BookPage
+    account={account}
+    onHome={() => setScreen('home')}
+    onAccount={openAccount}
+    onLogin={() => { setReturnTo('book'); setScreen('login') }}
+    />
 
     if (screen === 'home') return <HomePage onCreate={() => setScreen('book')} onAccount={openAccount} />
 
@@ -130,9 +153,9 @@ export default function App() {
             <button type="button" aria-pressed={registration} onClick={() => setScreen('register')}>Loo konto</button>
         </nav>
         {registration ? (
-            <RegisterPage onContinue={openSettings} onLogin={() => setScreen('login')} />
+            <RegisterPage onContinue={afterLogin} onLogin={() => setScreen('login')} />
         ) : (
-            <LoginPage onContinue={openSettings} onRegister={() => setScreen('register')} />
+            <LoginPage onContinue={afterLogin} onRegister={() => setScreen('register')} />
         )}
         </main>
     )
