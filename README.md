@@ -144,3 +144,9 @@ Käsitsi kontrollimiseks:
 6. Kontrolli mobiilivaadet laiustel 320–498 px ja töölauavaadet.
 
 Projektis ei ole praegu automaattestide käivitamise skripti.
+
+## Tasuta prooviversiooni avaldamine Renderis
+
+Repo juurkausta `render.yaml` ja `Dockerfile` seadistavad Reacti kasutajaliidese ning Flaski API üheks Renderi veebiteenuseks. Pärast Renderis GitLabi repo ühendamist avaldatakse rakendus tasuta aadressil `*.onrender.com`. Teenus vajab Renderis keskkonnamuutujaid `DATABASE_URL` (Neoni PostgreSQL-i ühendusaadress) ja `SECRET_KEY` (juhuslik pikk võti); Blueprint küsib nende väärtused loomisel.
+
+Enne avaldamist lükka haru `codex/book-preview-step` koos viimaste muudatustega GitLabi. Seejärel vali Renderis **New → Blueprint**, ühenda GitLab ja vali see repo ning haru. Esimene ehitus võib võtta mõne minuti. Tasuta veebiteenus võib pärast jõudeolekut uinuda ja järgmise avamise ajal uuesti käivituda. Hiljem saab Renderi teenusele lisada oma domeeni.
