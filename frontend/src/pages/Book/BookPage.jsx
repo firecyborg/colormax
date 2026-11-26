@@ -33,6 +33,7 @@ export default function BookPage({ onHome, onAccount, account, onLogin }) {
   const [previewPage, setPreviewPage] = useState(0)
   const preview = useRef(null)
   const submittingOrder = useRef(false)
+  const [savedBook, setSavedBook] = useState(null)
 
   useEffect(() => {
   sessionStorage.removeItem(DRAFT_KEY)
@@ -93,6 +94,7 @@ export default function BookPage({ onHome, onAccount, account, onLogin }) {
     setSaving(true)
     try {
       const book = await saveBook(title, selected.map((page) => page.id))
+      setSavedBook(book)
       window.alert(`Raamat „${book.title}” on salvestatud.`)
     } catch (error) {
       window.alert(error.message)
@@ -118,6 +120,12 @@ export default function BookPage({ onHome, onAccount, account, onLogin }) {
 
   const visible = pages.filter((page) => category === 'all' || String(page.category_id) === category)
   const total = BASE_PRICE + selected.length * PAGE_PRICE
+  const bookTitle = title.trim() || 'Minu värviraamat'
+  const matchesSavedBook = savedBook !== null
+    && savedBook.title === bookTitle
+    && savedBook.pages.length === selected.length
+    && selected.every((page, index) => page.id === savedBook.pages[index])
+  const savedBookId = matchesSavedBook ? savedBook.id : null
 
   if (checkout) return <CheckoutPage
     title={title}
@@ -125,6 +133,7 @@ export default function BookPage({ onHome, onAccount, account, onLogin }) {
     onHome={onHome}
     onPages={() => { setCheckout(false); setPreviewStep(false) }}
     onPreview={() => { setCheckout(false); setPreviewStep(true) }}
+    savedBookId={savedBookId}
     onSubmit={handleRegisterOrder}
   />
 
@@ -185,7 +194,11 @@ export default function BookPage({ onHome, onAccount, account, onLogin }) {
             ))}
           </div>
         </section>
-        <aside className="preview-order-card"><h2>Sinu raamat</h2><div className="preview-cover"><Logo /><strong>{title.trim() || 'Minu värviraamat'}</strong><span>{selected.length} värvimislehekülge</span></div><dl><div><dt>Lehekülgi</dt><dd>{selected.length}</dd></div><div><dt>Raamatu hind</dt><dd>{money(total)}</dd></div></dl><button type="button" className="book-outline" onClick={() => setPreviewStep(false)}>Muuda pilte</button><button type="button" className="book-primary" onClick={goToCheckout}>Jätka tellimusega <span aria-hidden="true">→</span></button></aside>
+        <aside className="preview-order-card"><h2>Sinu raamat</h2><div className="preview-cover"><Logo /><strong>{bookTitle}</strong><span>{selected.length} värvimislehekülge</span></div><dl><div><dt>Lehekülgi</dt><dd>{selected.length}</dd></div><div><dt>Raamatu hind</dt><dd>{money(total)}</dd></div></dl><button type="button" className="book-outline" onClick={() => setPreviewStep(false)}>Muuda pilte</button>
+          <button type="button" className="book-primary" disabled={saving} onClick={goToCheckout}>
+            Jätka tellimusega <span aria-hidden="true">→</span>
+          </button>
+        </aside>
       </div>}
     </main>
   </div>

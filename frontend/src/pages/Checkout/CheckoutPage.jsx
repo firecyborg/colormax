@@ -9,7 +9,7 @@ const PAYMENT_OPTIONS = [
   { id: 'invoice', name: 'Arve', note: 'Saadame arve sinu e-postile.' },
 ]
 
-export default function CheckoutPage({ title, pages, onHome, onPages, onPreview, onSubmit }) {
+export default function CheckoutPage({ title, pages, onHome, onPages, onPreview, onSubmit, savedBookId }) {
   const [delivery, setDelivery] = useState(DELIVERY_OPTIONS[0].id)
   const [payment, setPayment] = useState(PAYMENT_OPTIONS[0].id)
   const [customer, setCustomer] = useState({ name: '', email: '', address: '' })
@@ -35,6 +35,7 @@ export default function CheckoutPage({ title, pages, onHome, onPages, onPreview,
       delivery,
       payment,
       customer,
+      bookId: savedBookId,
     })
   }
 

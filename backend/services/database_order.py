@@ -21,32 +21,36 @@ PAYMENT_METHODS = {
 }
 
 
-def register_order_database(*, title, page_ids, delivery, payment, customer, user_id):
-    """Salvesta tellimus koos selle raamatu ja lehekülgedega."""
-    if title is None:
-        title = ""
-    if not isinstance(title, str):
-        return jsonify({"error": "Pealkiri peab olema tekst."}), 400
+def register_order_database(*, title, page_ids, delivery, payment, customer, user_id, book_id=None):
+    """Salvesta tellimus olemasolevale või uuele raamatule."""
+    if book_id is not None:
+        if type(book_id) is not int or not 1 <= book_id:
+            return jsonify({"error": "Raamatu ID peab olema kehtiv täisarv."}), 400
+    else:
+        if title is None:
+            title = ""
+        if not isinstance(title, str):
+            return jsonify({"error": "Pealkiri peab olema tekst."}), 400
 
-    title = title.strip()
-    if not title:
-        title = "Minu värviraamat"
-    if len(title) > 100 or "\x00" in title:
-        return jsonify({"error": "Sisesta korrektne kuni 100 märgi pikkune pealkiri."}), 400
+        title = title.strip()
+        if not title:
+            title = "Minu värviraamat"
+        if len(title) > 100 or "\x00" in title:
+            return jsonify({"error": "Sisesta korrektne kuni 100 märgi pikkune pealkiri."}), 400
 
-    if not isinstance(page_ids, list):
-        return jsonify({"error": "Raamatus peab olema 1–20 lehekülge."}), 400
+        if not isinstance(page_ids, list):
+            return jsonify({"error": "Raamatus peab olema 1–20 lehekülge."}), 400
 
-    page_count = len(page_ids)
-    if not 1 <= page_count <= 20:
-        return jsonify({"error": "Raamatus peab olema 1–20 lehekülge."}), 400
+        page_count = len(page_ids)
+        if not 1 <= page_count <= 20:
+            return jsonify({"error": "Raamatus peab olema 1–20 lehekülge."}), 400
 
-    for page_id in page_ids:
-        if type(page_id) is not int or not 1 <= page_id <= 2_147_483_647:
-            return jsonify({"error": "Lehekülgede ID-d peavad olema kehtivad täisarvud."}), 400
+        for page_id in page_ids:
+            if type(page_id) is not int or not 1 <= page_id <= 2_147_483_647:
+                return jsonify({"error": "Lehekülgede ID-d peavad olema kehtivad täisarvud."}), 400
 
-    if len(set(page_ids)) != page_count:
-        return jsonify({"error": "Leheküljed peavad olema erinevad."}), 400
+        if len(set(page_ids)) != page_count:
+            return jsonify({"error": "Leheküljed peavad olema erinevad."}), 400
 
     if not isinstance(customer, dict):
         return jsonify({"error": "Kliendi andmed on kohustuslikud."}), 400
@@ -82,20 +86,42 @@ def register_order_database(*, title, page_ids, delivery, payment, customer, use
 
     delivery_method, delivery_price_cents = DELIVERY_OPTIONS[delivery]
     payment_method = PAYMENT_METHODS[payment]
-    pages_price_cents = page_count * PAGE_PRICE_CENTS
-    total_price_cents = BASE_PRICE_CENTS + pages_price_cents + delivery_price_cents
 
     try:
         with get_connection() as connection:
             with connection.cursor() as cursor:
-                cursor.execute(
-                    "SELECT id FROM coloring_pages WHERE id = ANY(%s) FOR KEY SHARE",
-                    (page_ids,),
-                )
-                if len(cursor.fetchall()) != page_count:
-                    return jsonify({"error": "Vähemalt üks valitud lehekülg puudub."}), 400
+                if book_id is None:
+                    cursor.execute(
+                        "SELECT id FROM coloring_pages WHERE id = ANY(%s) FOR KEY SHARE",
+                        (page_ids,),
+                    )
+                    if len(cursor.fetchall()) != page_count:
+                        return jsonify({"error": "Vähemalt üks valitud lehekülg puudub."}), 400
 
-                book, _ = insert_book(cursor, title, page_ids, user_id)
+                    book, _ = insert_book(cursor, title, page_ids, user_id)
+                    book_id = book["id"]
+                else:
+                    cursor.execute(
+                        """
+                        SELECT id FROM books
+                        WHERE id = %s AND user_id = %s
+                        FOR SHARE
+                        """,
+                        (book_id, user_id),
+                    )
+                    if cursor.fetchone() is None:
+                        return jsonify({"error": "Salvestatud raamatut ei leitud."}), 404
+
+                    cursor.execute(
+                        "SELECT COUNT(*) AS page_count FROM book_pages WHERE book_id = %s",
+                        (book_id,),
+                    )
+                    page_count = cursor.fetchone()["page_count"]
+                    if not 1 <= page_count <= 20:
+                        return jsonify({"error": "Raamatus peab olema 1–20 lehekülge."}), 400
+
+                pages_price_cents = page_count * PAGE_PRICE_CENTS
+                total_price_cents = BASE_PRICE_CENTS + pages_price_cents + delivery_price_cents
                 cursor.execute(
                     """
                     INSERT INTO orders (
@@ -111,7 +137,7 @@ def register_order_database(*, title, page_ids, delivery, payment, customer, use
                     """,
                     (
                         user_id,
-                        book["id"],
+                        book_id,
                         customer_name,
                         customer_email,
                         address,

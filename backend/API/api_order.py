@@ -22,4 +22,5 @@ def register_order():
         payment=data.get("payment"),
         customer=data.get("customer"),
         user_id=user_id,
+        book_id=data.get("bookId"),
     )
